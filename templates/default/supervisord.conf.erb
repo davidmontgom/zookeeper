@@ -1,0 +1,38 @@
+# -*- conf -*-
+[include]
+files = *.supervisor
+[supervisord]
+pidfile = /var/run/supervisord.pid
+nodaemon=false
+[supervisorctl]
+serverurl=unix:///var/run/supervisord.sock ; use a unix:// URL for a unix socket
+[unix_http_server]
+file = /var/run/supervisord.sock
+[rpcinterface:supervisor]
+supervisor.rpcinterface_factory = supervisor.rpcinterface:make_main_rpcinterface
+
+[program:zookeeper]
+command= sh zkServer.sh start-foreground
+directory = <%=Chef::Config[:file_cache_path]%>/zookeeper-<%=node['zookeeper']['version']%>/bin/
+process_name=%(program_name)s
+autostart=true
+autorestart=true
+stdout_logfile=/var/log/zookeeper.log
+stopsignal=KILL
+#stopasgroup = true
+#killasgroup = true
+#stdout_logfile = /tmp/zookeeper.out
+#stderr_logfile = /tmp/zookeeper.err
+pidfile = /var/run/zookeeper.pid
+
+
+[group:zookeeper_server]
+programs=zookeeper
+
+
+
+
+
+
+
+

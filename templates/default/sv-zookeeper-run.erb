@@ -1,0 +1,4 @@
+#!/bin/sh
+exec 2>&1
+exec  <%= @node[:runit][:chpst_bin] %> <%=Chef::Config[:file_cache_path]%>/zookeeper-<%=node['zookeeper']['version']%>/bin/zkServer.sh start >> /tmp/zookeeper.log 2>&1
+

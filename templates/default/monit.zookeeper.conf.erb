@@ -1,0 +1,4 @@
+check process zookeeper
+  with pidfile "/var/run/zookeeper/zookeeper-server.pid"
+  start program = "/etc/init.d/zookeeper-server start"
+  stop program = "/etc/init.d/zookeeper-server stop"
