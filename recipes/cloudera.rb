@@ -150,6 +150,8 @@ cmd = "> /etc/hostname"
 os.system(cmd)
 cmd = """echo '%s' | tee -a /etc/hostname""" % host
 os.system(cmd)
+cmd = "/etc/init.d/networking restart"
+os.system(cmd)
 cmd = "/etc/init.d/hostname restart"
 os.system(cmd)
 cmd = "touch #{Chef::Config[:file_cache_path]}/hostname.lock"
