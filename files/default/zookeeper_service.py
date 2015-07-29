@@ -24,14 +24,21 @@ zk_host_list = zk_host_list.split(',')
 temp = open('/var/zookeeper_node_name.json').readlines()[0]
 node,ip = temp.split(' ')
 
-server_type = node.split('-')[0]
+node_meta = node.split('-')
+server_type = node_meta[0]
+environment = node_meta[2]
+dataceter = node_meta[1]
+location = node_meta[3]
 #{server_type}-#{datacenter}-#{node.chef_environment}-#{location}
-if server_type=='zk':
-    pass
+if environment=='local':
+    ip='127.0.0.1'
 
 for i in xrange(len(zk_host_list)):
     zk_host_list[i]=zk_host_list[i]+':2181' 
 zk_host_str = ','.join(zk_host_list)
+
+    
+
 
 zk = zc.zk.ZooKeeper(zk_host_str)
 path = '/%s/' % (node)
