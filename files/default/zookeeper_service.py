@@ -2,6 +2,10 @@ import zc.zk
 import time
 import json
 import os
+import sys
+
+import logging #https://kazoo.readthedocs.org/en/latest/basic_usage.html
+logging.basicConfig()
 """
 0) load zookeeper from file written by chef
 1) get ip address from file
@@ -43,6 +47,8 @@ while True:
     change=False
     if change:
         os.system('sh /var/solo.sh')
+    sys.stdout.flush()
+    sys.stderr.flush()
         
     
     
