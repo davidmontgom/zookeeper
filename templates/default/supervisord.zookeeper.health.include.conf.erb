@@ -1,0 +1,20 @@
+[program:zookeeper_health]
+command = /usr/bin/python /var/zookeeper_service.py
+autostart=true
+autorestart=true
+
+stopsignal=KILL
+stopasgroup = true
+killasgroup = true
+
+stdout_logfile=/tmp/zookeeper_health.log
+stdout_logfile_maxbytes=1MB
+stdout_logfile_backups=1
+
+stderr_logfile = /tmp/zookeeper_health.err
+stderr_logfile_maxbytes=1MB
+stderr_logfile_backups=1
+
+[group:zookeeper_health_server]
+programs=zookeeper_health
+

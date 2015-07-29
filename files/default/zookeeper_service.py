@@ -1,0 +1,48 @@
+import zc.zk
+import time
+import json
+import os
+"""
+0) load zookeeper from file written by chef
+1) get ip address from file
+2) register server
+3) If change in servers then rerun chef
+"""
+
+
+# with open('/tmp/zookeeper_hosts') as f:
+#     zk_host_list = json.load(f)
+ 
+#
+zk_host_list = open('/var/zookeeper_hosts.json').readlines()[0]
+zk_host_list = zk_host_list.split(',')
+
+temp = open('/var/zookeeper_node_name.json').readlines()[0]
+node,ip = temp.split(' ')
+
+server_type = node.split('-')[0]
+#{server_type}-#{datacenter}-#{node.chef_environment}-#{location}
+if server_type=='zk':
+    pass
+
+for i in xrange(len(zk_host_list)):
+    zk_host_list[i]=zk_host_list[i]+':2181' 
+zk_host_str = ','.join(zk_host_list)
+
+zk = zc.zk.ZooKeeper(zk_host_str)
+path = '/%s/' % (node)
+data = ''
+if zk.exists(path)==None:
+    zk.create_recursive(path,data,zc.zk.OPEN_ACL_UNSAFE)
+#zk.register(path, (ip, 8080))
+zk.register(path, (ip))
+addresses = zk.children(path)
+while True:
+    print sorted(addresses)
+    time.sleep(2)
+    change=False
+    if change:
+        os.system('sh /var/solo.sh')
+        
+    
+    

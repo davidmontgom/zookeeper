@@ -144,7 +144,8 @@ template "#{Chef::Config[:file_cache_path]}/zookeeper-#{version}/conf/zoo.cfg" d
   owner "root"
   group "root"
   mode "0644"
-  variables :zookeeper => zookeeper
+  #variables :zookeeper => zookeeper
+  variables lazy { { :zookeeper =>  File.read("#{Chef::Config[:file_cache_path]}/zookeeper_hosts") } }
   notifies :restart, resources(:service => "supervisord")
 end
 
