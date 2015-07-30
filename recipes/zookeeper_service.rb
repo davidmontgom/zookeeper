@@ -6,6 +6,8 @@ data_bag("my_data_bag")
 zk = data_bag_item("my_data_bag", "zk")
 zk_hosts = zk[node.chef_environment][datacenter][location]["zookeeper_hosts"]
 
+db = data_bag_item("my_data_bag", "my")
+keypair=db[node.chef_environment][location]["keypair"]
 
 #zookeeper_hosts = File.write("/var/zookeeper_hosts")
 #File.open("/tmp/zookeeper_hosts.json","w") do |f|
@@ -14,6 +16,33 @@ zk_hosts = zk[node.chef_environment][datacenter][location]["zookeeper_hosts"]
 
 easy_install_package "zc.zk" do
   action :install
+end
+
+easy_install_package "paramiko" do
+  action :install
+end
+
+if datacenter!='local'
+  script "zookeeper_add" do
+    interpreter "python"
+    user "root"
+  code <<-PYCODE
+zookeeper_hosts = '#{zk_hosts}'
+ip_address_list = zookeeper_hosts.split(',')
+for ip_address in ip_address_list:
+    keypair_path = '/root/.ssh/#{keypair}'
+    key = paramiko.RSAKey.from_private_key_file(keypair_path)
+    ssh = paramiko.SSHClient()
+    ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+    ssh.connect(ip_address, 22, username=username, pkey=key)
+    cmd = "sudo ufw allow from #{node[:ipaddress]} to any port 2181"
+    stdin, stdout, stderr = ssh.exec_command(cmd)
+    out = stdout.read()
+    err = stderr.read()
+    print "out--", out
+    ssh.close()
+PYCODE
+  end
 end
 
 script "zookeeper_files" do
