@@ -27,6 +27,7 @@ if datacenter!='local'
     interpreter "python"
     user "root"
   code <<-PYCODE
+import paramiko
 zookeeper_hosts = '#{zk_hosts}'
 ip_address_list = zookeeper_hosts.split(',')
 for ip_address in ip_address_list:
