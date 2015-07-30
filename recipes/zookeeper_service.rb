@@ -7,7 +7,8 @@ zk = data_bag_item("my_data_bag", "zk")
 zk_hosts = zk[node.chef_environment][datacenter][location]["zookeeper_hosts"]
 
 db = data_bag_item("my_data_bag", "my")
-keypair=db[node.chef_environment][location]["keypair"]
+keypair=db[node.chef_environment][location]["ssh"]["keypair"]
+username=db[node.chef_environment][location]["ssh"]["username"]
 
 #zookeeper_hosts = File.write("/var/zookeeper_hosts")
 #File.open("/tmp/zookeeper_hosts.json","w") do |f|
@@ -28,6 +29,7 @@ if datacenter!='local'
     user "root"
   code <<-PYCODE
 import paramiko
+username='#{username}'
 zookeeper_hosts = '#{zk_hosts}'
 ip_address_list = zookeeper_hosts.split(',')
 for ip_address in ip_address_list:
