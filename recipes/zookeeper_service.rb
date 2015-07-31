@@ -23,6 +23,12 @@ easy_install_package "paramiko" do
   action :install
 end
 
+=begin
+if new zk node then:
+  add this to them
+  add them to this
+=end
+
 if datacenter!='local'
   script "zookeeper_add" do
     interpreter "python"
