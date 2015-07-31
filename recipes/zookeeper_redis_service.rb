@@ -23,9 +23,20 @@ if datacenter!='local'
     interpreter "python"
     user "root"
   code <<-PYCODE
+import zc.zk
+import logging 
+logging.basicConfig()
+
+
 import paramiko
 username='#{username}'
 zookeeper_hosts = '#{zk_hosts}'
+zk_host_list = '#{zk_hosts}'.split(',')
+for i in xrange(len(zk_host_list)):
+    zk_host_list[i]=zk_host_list[i]+':2181' 
+zk_host_str = ','.join(zk_host_list)
+zk = zc.zk.ZooKeeper(zk_host_str)
+
 ip_address_list = zookeeper_hosts.split(',')
 node = 'redis-#{datacenter}-#{node.chef_environment}-#{location}'
 path = '/%s/' % (node)
@@ -79,6 +90,16 @@ if datacenter!='local' and server_type=='sentinal'
     interpreter "python"
     user "root"
   code <<-PYCODE
+import zc.zk
+import logging 
+logging.basicConfig()
+
+zk_host_list = '#{zk_hosts}'.split(',')
+for i in xrange(len(zk_host_list)):
+    zk_host_list[i]=zk_host_list[i]+':2181' 
+zk_host_str = ','.join(zk_host_list)
+zk = zc.zk.ZooKeeper(zk_host_str)
+
 import paramiko
 username='#{username}'
 zookeeper_hosts = '#{zk_hosts}'
