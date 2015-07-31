@@ -23,6 +23,7 @@ if datacenter!='local'
     interpreter "python"
     user "root"
   code <<-PYCODE
+import os
 import zc.zk
 import logging 
 logging.basicConfig()
@@ -90,6 +91,7 @@ if datacenter!='local' and server_type=='sentinal'
     interpreter "python"
     user "root"
   code <<-PYCODE
+import os
 import zc.zk
 import logging 
 logging.basicConfig()
