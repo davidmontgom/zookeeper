@@ -31,7 +31,7 @@ dataceter = node_meta[1]
 location = node_meta[3]
 
 if os.path.isfile('/var/shard.txt'):
-    shard = open('/var/shard.txt').readlines()[0]
+    shard = open('/var/shard.txt').readlines()[0].strip()
     node = "%s-%s" % (node,shard)
 
 
