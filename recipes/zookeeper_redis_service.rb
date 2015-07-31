@@ -101,9 +101,9 @@ if zk.exists(path):
         err = stderr.read()
         print "out--", out
         ssh.close()
-        os.system("sudo ufw allow from %s to any port 6379" % ip_address)
-        
-node = 'sentinal-#{datacenter}-#{node.chef_environment}-#{location}'
+        os.system("sudo ufw allow from %s to any port 26379" % ip_address)
+   
+node = 'redis-#{datacenter}-#{node.chef_environment}-#{location}'
 path = '/%s/' % (node)
 if zk.exists(path):
     addresses = zk.children(path)
