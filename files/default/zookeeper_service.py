@@ -55,7 +55,7 @@ if zk.exists(path)==None:
 zk.register(path, (ip))
 addresses = zk.children(path)
 while True:
-    print sorted(addresses)
+    print path,sorted(addresses)
     time.sleep(2)
     change=False
     if change:
