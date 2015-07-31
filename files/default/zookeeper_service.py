@@ -29,6 +29,12 @@ server_type = node_meta[0]
 environment = node_meta[2]
 dataceter = node_meta[1]
 location = node_meta[3]
+
+if os.path.isfile('/var/shard.txt'):
+    shard = open('/var/shard.txt').readlines()[0]
+    node = "%s-%s" % (node,shard)
+
+
 #{server_type}-#{datacenter}-#{node.chef_environment}-#{location}
 if environment=='local':
     ip='127.0.0.1'
