@@ -15,6 +15,8 @@ bash "install_exhibitor" do
     cd exhibitor
     wget https://raw.github.com/Netflix/exhibitor/master/exhibitor-standalone/src/main/resources/buildscripts/standalone/maven/pom.xml
     mvn3 clean package
+    cd /var/exhibitor/target
+    cp exhibitor-*.jar exhibitor.jar
   EOH
   action :run
   not_if {File.exists?("/var/exhibitor")}
