@@ -25,10 +25,10 @@ node,ip = temp.split(' ')
 node_meta = node.split('-')
 node = node_meta[:-1]
 
-# server_type = node_meta[0]
-# environment = node_meta[2]
-# dataceter = node_meta[1]
-# location = node_meta[3]
+server_type = node_meta[0]
+environment = node_meta[2]
+dataceter = node_meta[1]
+location = node_meta[3]
 
 if os.path.isfile('/var/shard.txt'):
     shard = open('/var/shard.txt').readlines()[0].strip()
