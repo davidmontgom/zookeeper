@@ -24,6 +24,7 @@ node,ip = temp.split(' ')
 
 node_meta = node.split('-')
 node = node_meta[:-1]
+node = '-'.join(node)
 
 server_type = node_meta[0]
 environment = node_meta[2]
