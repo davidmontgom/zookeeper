@@ -66,7 +66,7 @@ f.write('#{zk_hosts}')
 f.close()
 
 f = open('/var/zookeeper_node_name.json','w')
-f.write('#{server_type}-#{datacenter}-#{node.chef_environment}-#{location} #{node[:ipaddress]}')
+f.write('#{node.name} #{node[:ipaddress]}')
 f.close()
 
 f = open('/var/zk_process_monitor_list.json','w')

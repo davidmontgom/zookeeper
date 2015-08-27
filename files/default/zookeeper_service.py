@@ -12,8 +12,6 @@ logging.basicConfig()
 2) register server
 3) If change in servers then rerun chef
 """
-
-
 # with open('/tmp/zookeeper_hosts') as f:
 #     zk_host_list = json.load(f)
  
@@ -25,6 +23,9 @@ temp = open('/var/zookeeper_node_name.json').readlines()[0]
 node,ip = temp.split(' ')
 
 node_meta = node.split('-')
+node = node_meta[:-1]
+node = '-'.join(node)
+
 server_type = node_meta[0]
 environment = node_meta[2]
 dataceter = node_meta[1]
@@ -34,8 +35,6 @@ if os.path.isfile('/var/shard.txt'):
     shard = open('/var/shard.txt').readlines()[0].strip()
     node = "%s-%s" % (node,shard)
 
-
-#{server_type}-#{datacenter}-#{node.chef_environment}-#{location}
 if environment=='local':
     ip='127.0.0.1'
 
