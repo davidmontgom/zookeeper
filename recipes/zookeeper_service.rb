@@ -10,6 +10,8 @@ db = data_bag_item("my_data_bag", "my")
 keypair=db[node.chef_environment][location]["ssh"]["keypair"]
 username=db[node.chef_environment][location]["ssh"]["username"]
 
+zk_process_monitor_list = node['zk_process_monitor']
+
 #zookeeper_hosts = File.write("/var/zookeeper_hosts")
 #File.open("/tmp/zookeeper_hosts.json","w") do |f|
 #  f.write(zk_hosts.to_json)
@@ -66,6 +68,12 @@ f.close()
 f = open('/var/zookeeper_node_name.json','w')
 f.write('#{server_type}-#{datacenter}-#{node.chef_environment}-#{location} #{node[:ipaddress]}')
 f.close()
+
+f = open('/var/zk_process_monitor_list.json','w')
+f.write('#{zk_process_monitor_list}')
+f.close()
+
+
 
 PYCODE
 end
