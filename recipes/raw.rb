@@ -16,6 +16,7 @@ end
 
 
 
+
 version = '3.4.6'
 bash "install_zookeeper" do
   user "root"

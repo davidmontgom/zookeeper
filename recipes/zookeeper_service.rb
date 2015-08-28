@@ -21,6 +21,10 @@ easy_install_package "zc.zk" do
   action :install
 end
 
+easy_install_package "psutil" do
+  action :install
+end
+
 easy_install_package "paramiko" do
   action :install
 end
@@ -77,6 +81,7 @@ f.close()
 
 PYCODE
 end
+
 
 cookbook_file "/var/zookeeper_service.py" do
   source "zookeeper_service.py"

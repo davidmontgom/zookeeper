@@ -31,6 +31,17 @@ environment = node_meta[2]
 dataceter = node_meta[1]
 location = node_meta[3]
 
+
+
+def get_process_list():
+    if os.path.isfile('/var/zk_process_monitor_list.json'):
+        with open("/var/zk_process_monitor_list.json") as json_file:
+            process_list = json.load(json_file)
+    else:
+        process_list = []
+process_list = get_process_list()
+    
+
 if os.path.isfile('/var/shard.txt'):
     shard = open('/var/shard.txt').readlines()[0].strip()
     node = "%s-%s" % (node,shard)
@@ -44,7 +55,6 @@ zk_host_str = ','.join(zk_host_list)
 
     
 
-
 zk = zc.zk.ZooKeeper(zk_host_str)
 path = '/%s/' % (node)
 data = ''
@@ -53,12 +63,41 @@ if zk.exists(path)==None:
 #zk.register(path, (ip, 8080))
 zk.register(path, (ip))
 addresses = zk.children(path)
+data = zk.properties(path)
+
+def get_process(process_list):
+    """
+    find proccess by username or name
+    port discovery is hard
+    
+    for zookeeper add username and java check e.g. username='zookeepeer' and name = 'java'
+    """
+    process_hash = {}
+    for ps in process_list:
+        process_hash[ps]=1
+    data_hash = {}
+    for proc in psutil.process_iter():
+        if process_hash.has_key(proc.name()) or process_hash.has_key(proc.username()):
+            if process_hash.has_key(proc.name()):
+                this_name = proc.name()
+            if process_hash.has_key(proc.username()):
+                this_name = proc.username()
+            proc_hash = proc.as_dict()
+            pid = proc_hash['pid']
+            p = psutil.Process(pid)
+            data_hash[this_name]={'pid':pid, 'is_running':str(p.is_running())}
+    return data_hash
+
 while True:
     print path,sorted(addresses)
     time.sleep(2)
     change=False
     if change:
         os.system('sh /var/solo.sh')
+    if process_list:
+        data_hash = get_process(process_list)
+        data.set(data_hash)
+        print 'updated data:', data_hash
     sys.stdout.flush()
     sys.stderr.flush()
         
