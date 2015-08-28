@@ -3,7 +3,7 @@ import time
 import json
 import os
 import sys
-
+import psutil
 import logging #https://kazoo.readthedocs.org/en/latest/basic_usage.html
 logging.basicConfig()
 """
@@ -39,6 +39,7 @@ def get_process_list():
             process_list = json.load(json_file)
     else:
         process_list = []
+    return process_list
 process_list = get_process_list()
     
 
