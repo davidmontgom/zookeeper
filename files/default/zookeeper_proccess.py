@@ -32,8 +32,6 @@ if os.path.isfile('/var/zk_process_monitor_list.json'):
 else:
     process_list = []
     
-print  process_list  
-exit()
     
     
 process_list = ['zookeeper']
@@ -60,17 +58,32 @@ for i in xrange(len(zk_host_list)):
     zk_host_list[i]=zk_host_list[i]+':2181' 
 zk_host_str = ','.join(zk_host_list)
 
-    
+#node = 'do-frontend-sf-development'
 zk = zc.zk.ZooKeeper(zk_host_str)
 path = '/%s-process/' % (node)
 data = ''
+data = zk.properties(path)
+addresses = zk.children(path)
+print dir(addresses)
+print data, data.items()
+
 
 if zk.exists(path)==None:
     zk.create_recursive(path,data,zc.zk.OPEN_ACL_UNSAFE)
 #zk.register(path, (ip, 8080))
 zk.register(path, (ip))
 addresses = zk.children(path)
-data = zk.properties(path)
+data = zk.properties(path + ip)
+#data = zk.properties(path)
+#print data.items()
+print dir(data)
+
+print zk.is_ephemeral(path)
+
+exit()
+#print data.real_path
+data.update({'etaa':'adadf'})
+exit()
 #   
 # p = psutil.Process(3077)
 # for connection in p.connections():
@@ -128,7 +141,8 @@ def get_process(process_list):
             proc_hash = proc.as_dict()
             pid = proc_hash['pid']
             p = psutil.Process(pid)
-            data_hash[this_name]={'pid':pid, 'is_running':str(p.is_running())}
+            #data_hash[this_name] = {'pid':pid, 'is_running':str(p.is_running())}
+            data_hash[ip]= {this_name:{'pid':pid, 'is_running':str(p.is_running())}}
     return data_hash
 
 # data = get_process(process_list)
@@ -139,10 +153,9 @@ while True:
     print path,sorted(addresses)
     print 'remote data:',data.items()
     data_hash = get_process(process_list)
-    data.set(data_hash)
+    data.update(data_hash)
+    #data.set(data_hash)
     print 'updated data:', data_hash
-    #data.update(secret='123')
-    #data.set()
     print '*'*80
     time.sleep(2)
     change=False

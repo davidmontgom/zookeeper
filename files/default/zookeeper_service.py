@@ -66,6 +66,7 @@ zk.register(path, (ip))
 addresses = zk.children(path)
 data = zk.properties(path)
 
+
 def get_process(process_list):
     """
     find proccess by username or name
@@ -95,9 +96,9 @@ while True:
     change=False
     if change:
         os.system('sh /var/solo.sh')
-    if process_list:
-        data_hash = get_process(process_list)
-        data.set(data_hash)
+#     if process_list:
+#         data_hash = get_process(process_list)
+        #data.set(data_hash)
         print 'updated data:', data_hash
     sys.stdout.flush()
     sys.stderr.flush()
