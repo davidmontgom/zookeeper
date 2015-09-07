@@ -40,7 +40,7 @@ def get_process_list():
     else:
         process_list = []
     return process_list
-process_list = get_process_list()
+#process_list = get_process_list()
     
 
 if os.path.isfile('/var/shard.txt'):
