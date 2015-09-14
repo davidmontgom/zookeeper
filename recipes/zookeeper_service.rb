@@ -35,7 +35,7 @@ if new zk node then:
   add them to this
 =end
 
-if datacenter!='local'
+if datacenter!='local' and datacenter!='aws'
   script "zookeeper_add" do
     interpreter "python"
     user "root"
