@@ -53,17 +53,18 @@ if environment=='local':
 for i in xrange(len(zk_host_list)):
     zk_host_list[i]=zk_host_list[i]+':2181' 
 zk_host_str = ','.join(zk_host_list)
-
+path = '/%s/' % (node)
     
 def get_zk_conn():
     try:
         zk = zc.zk.ZooKeeper(zk_host_str)
-    except:
+    except Exception as e:
+        print 'get_zk_conn:', str(e)
         zk = None
     return zk
  
 
-def register_node(zk):
+def register_node(zk,node,ip):
     try:
         path = '/%s/' % (node)
         data = ''
@@ -73,13 +74,14 @@ def register_node(zk):
         zk.register(path, (ip))
         addresses = zk.children(path)
         data = zk.properties(path)
-    except:
+    except Exception as e:
+        print 'register_node:', str(e)
         addresses=None
         data = None
     return addresses,data
 
 zk = get_zk_conn()
-addresses,data = register_node(zk)
+addresses,data = register_node(zk,node,ip)
 
 def get_process(process_list):
     """
@@ -118,9 +120,10 @@ while True:
             print 'updated data:', data_hash
         sys.stdout.flush()
         sys.stderr.flush()
-    except:
+    except Exception as e:
+        print 'while:', str(e)
         zk = get_zk_conn()
-        addresses,data = register_node(zk)
+        addresses,data = register_node(zk,node,ip)
         
         
     
