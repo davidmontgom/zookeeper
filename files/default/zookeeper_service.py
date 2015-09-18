@@ -55,17 +55,31 @@ for i in xrange(len(zk_host_list)):
 zk_host_str = ','.join(zk_host_list)
 
     
+def get_zk_conn():
+    try:
+        zk = zc.zk.ZooKeeper(zk_host_str)
+    except:
+        zk = None
+    return zk
+ 
 
-zk = zc.zk.ZooKeeper(zk_host_str)
-path = '/%s/' % (node)
-data = ''
-if zk.exists(path)==None:
-    zk.create_recursive(path,data,zc.zk.OPEN_ACL_UNSAFE)
-#zk.register(path, (ip, 8080))
-zk.register(path, (ip))
-addresses = zk.children(path)
-data = zk.properties(path)
+def register_node(zk):
+    try:
+        path = '/%s/' % (node)
+        data = ''
+        if zk.exists(path)==None:
+            zk.create_recursive(path,data,zc.zk.OPEN_ACL_UNSAFE)
+        #zk.register(path, (ip, 8080))
+        zk.register(path, (ip))
+        addresses = zk.children(path)
+        data = zk.properties(path)
+    except:
+        addresses=None
+        data = None
+    return addresses,data
 
+zk = get_zk_conn()
+addresses,data = register_node(zk)
 
 def get_process(process_list):
     """
@@ -91,17 +105,23 @@ def get_process(process_list):
     return data_hash
 
 while True:
-    print path,sorted(addresses)
-    time.sleep(2)
-    change=False
-    if change:
-        os.system('sh /var/solo.sh')
-#     if process_list:
-#         data_hash = get_process(process_list)
-        #data.set(data_hash)
-        print 'updated data:', data_hash
-    sys.stdout.flush()
-    sys.stderr.flush()
+    
+    try:
+        print path,sorted(addresses)
+        time.sleep(2)
+        change=False
+        if change:
+            os.system('sh /var/solo.sh')
+    #     if process_list:
+    #         data_hash = get_process(process_list)
+            #data.set(data_hash)
+            print 'updated data:', data_hash
+        sys.stdout.flush()
+        sys.stderr.flush()
+    except:
+        zk = get_zk_conn()
+        addresses,data = register_node(zk)
+        
         
     
     
