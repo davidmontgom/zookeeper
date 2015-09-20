@@ -82,7 +82,7 @@ f.close()
 PYCODE
 end
 
-
+ 
 cookbook_file "/var/zookeeper_service.py" do
   source "zookeeper_service.py"
   mode 00744
@@ -94,7 +94,7 @@ template "/etc/supervisor/conf.d/supervisord.zookeeper.health.include.conf" do
   owner "root"
   group "root"
   mode "0755"
-  notifies :restart, resources(:service => "supervisord")
+  notifies :restart, resources(:service => "supervisord"), :immediately 
 end
 service "supervisord"
 
