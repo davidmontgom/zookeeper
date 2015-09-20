@@ -1,0 +1,4 @@
+check process zookeeper-health
+  	with matching "/usr/bin/python /var/zookeeper_service.py"
+	start program = "/usr/local/bin/supervisorctl start zookeeper_health_server:"
+	stop program = "/usr/local/bin/supervisorctl stop zookeeper_health_server:"
