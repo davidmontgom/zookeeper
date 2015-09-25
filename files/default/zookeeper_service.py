@@ -80,7 +80,10 @@ def register_node(zk,node,ip):
         data = None
     return addresses,data
 
-zk = get_zk_conn()
+zk = None
+while zk==None:
+    zk = get_zk_conn()
+    time.sleep(.5)
 addresses,data = register_node(zk,node,ip)
 
 def get_process(process_list):
