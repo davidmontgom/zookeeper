@@ -4,13 +4,14 @@ package "python-software-properties" do
   action :install
 end
 
+package "maven" do
+  action :install
+end
+
 bash "install_exhibitor" do
   user "root"
   cwd "/var"
   code <<-EOH
-    sudo apt-add-repository ppa:andrei-pozolotin/maven3
-    sudo apt-get update 
-    sudo apt-get -y install maven3
     git clone https://github.com/Netflix/exhibitor.git
     cd exhibitor
     wget https://raw.github.com/Netflix/exhibitor/master/exhibitor-standalone/src/main/resources/buildscripts/standalone/maven/pom.xml
