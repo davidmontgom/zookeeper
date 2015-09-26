@@ -1,4 +1,5 @@
+#monit procmatch ".*/usr/lib/jvm/java-7-openjdk-amd64/bin/java -Dzookeeper*"
 check process zookeeper
-  with pidfile "/var/run/zookeeper/zookeeper-server.pid"
-  start program = "/etc/init.d/zookeeper-server start"
-  stop program = "/etc/init.d/zookeeper-server stop"
+	with matching ".*/usr/lib/jvm/java-7-openjdk-amd64/bin/java -Dzookeeper*"
+	start program = "/usr/local/bin/supervisorctl start zookeeper_server:"
+	stop program = "/usr/local/bin/supervisorctl stop zookeeper_server:"
