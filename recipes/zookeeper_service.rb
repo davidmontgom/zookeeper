@@ -44,18 +44,19 @@ import paramiko
 username='#{username}'
 zookeeper_hosts = '#{zk_hosts}'
 ip_address_list = zookeeper_hosts.split(',')
-for ip_address in ip_address_list:
-    keypair_path = '/root/.ssh/#{keypair}'
-    key = paramiko.RSAKey.from_private_key_file(keypair_path)
-    ssh = paramiko.SSHClient()
-    ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-    ssh.connect(ip_address, 22, username=username, pkey=key)
-    cmd = "sudo ufw allow from #{node[:ipaddress]} to any port 2181"
-    stdin, stdout, stderr = ssh.exec_command(cmd)
-    out = stdout.read()
-    err = stderr.read()
-    print "out--", out
-    ssh.close()
+if len(ip_address_list)>1:
+  for ip_address in ip_address_list:
+      keypair_path = '/root/.ssh/#{keypair}'
+      key = paramiko.RSAKey.from_private_key_file(keypair_path)
+      ssh = paramiko.SSHClient()
+      ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+      ssh.connect(ip_address, 22, username=username, pkey=key)
+      cmd = "sudo ufw allow from #{node[:ipaddress]} to any port 2181"
+      stdin, stdout, stderr = ssh.exec_command(cmd)
+      out = stdout.read()
+      err = stderr.read()
+      print "out--", out
+      ssh.close()
 PYCODE
   end
 end
