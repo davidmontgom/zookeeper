@@ -125,7 +125,9 @@ while True:
         sys.stderr.flush()
     except Exception as e:
         print 'while:', str(e)
-        zk = get_zk_conn()
+        zk = None
+        while zk==None:
+            zk = get_zk_conn()
         addresses,data = register_node(zk,node,ip)
         
         
