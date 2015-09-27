@@ -44,7 +44,7 @@ import paramiko
 username='#{username}'
 zookeeper_hosts = '#{zk_hosts}'
 ip_address_list = zookeeper_hosts.split(',')
-if len(ip_address_list)>1:
+if len(ip_address_list)>=1:
   for ip_address in ip_address_list:
       keypair_path = '/root/.ssh/#{keypair}'
       key = paramiko.RSAKey.from_private_key_file(keypair_path)

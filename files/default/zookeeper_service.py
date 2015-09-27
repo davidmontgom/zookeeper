@@ -1,4 +1,5 @@
 import zc.zk
+from kazoo.client import KazooClient
 import time
 import json
 import os
@@ -16,11 +17,16 @@ logging.basicConfig()
 #     zk_host_list = json.load(f)
  
 #
+
+#zk_host_list = '107.170.219.233'
 zk_host_list = open('/var/zookeeper_hosts.json').readlines()[0]
 zk_host_list = zk_host_list.split(',')
-
 temp = open('/var/zookeeper_node_name.json').readlines()[0]
 node,ip = temp.split(' ')
+
+# node = 'do-fu-sf-development'
+# ip = '111.111.111.111'
+# print node,ip
 
 node_meta = node.split('-')
 node = node_meta[:-1]
@@ -30,18 +36,6 @@ server_type = node_meta[0]
 environment = node_meta[2]
 dataceter = node_meta[1]
 location = node_meta[3]
-
-
-
-def get_process_list():
-    if os.path.isfile('/var/zk_process_monitor_list.json'):
-        with open("/var/zk_process_monitor_list.json") as json_file:
-            process_list = json.load(json_file)
-    else:
-        process_list = []
-    return process_list
-#process_list = get_process_list()
-    
 
 if os.path.isfile('/var/shard.txt'):
     shard = open('/var/shard.txt').readlines()[0].strip()
@@ -54,82 +48,27 @@ for i in xrange(len(zk_host_list)):
     zk_host_list[i]=zk_host_list[i]+':2181' 
 zk_host_str = ','.join(zk_host_list)
 path = '/%s/' % (node)
-    
+  
+
 def get_zk_conn():
-    try:
-        zk = zc.zk.ZooKeeper(zk_host_str)
-    except Exception as e:
-        print 'get_zk_conn:', str(e)
-        zk = None
+    zk = KazooClient(hosts=zk_host_str, read_only=True)
+    zk.start()
     return zk
+zk = get_zk_conn()
  
+if zk.exists(path)==None:
+    zk.create(path,'', ephemeral=False)
 
-def register_node(zk,node,ip):
-    try:
-        path = '/%s/' % (node)
-        data = ''
-        if zk.exists(path)==None:
-            zk.create_recursive(path,data,zc.zk.OPEN_ACL_UNSAFE)
-        #zk.register(path, (ip, 8080))
-        zk.register(path, (ip))
-        addresses = zk.children(path)
-        data = zk.properties(path)
-    except Exception as e:
-        print 'register_node:', str(e)
-        addresses=None
-        data = None
-    return addresses,data
-
-zk = None
-while zk==None:
-    zk = get_zk_conn()
-    time.sleep(.5)
-addresses,data = register_node(zk,node,ip)
-
-def get_process(process_list):
-    """
-    find proccess by username or name
-    port discovery is hard
-    
-    for zookeeper add username and java check e.g. username='zookeepeer' and name = 'java'
-    """
-    process_hash = {}
-    for ps in process_list:
-        process_hash[ps]=1
-    data_hash = {}
-    for proc in psutil.process_iter():
-        if process_hash.has_key(proc.name()) or process_hash.has_key(proc.username()):
-            if process_hash.has_key(proc.name()):
-                this_name = proc.name()
-            if process_hash.has_key(proc.username()):
-                this_name = proc.username()
-            proc_hash = proc.as_dict()
-            pid = proc_hash['pid']
-            p = psutil.Process(pid)
-            data_hash[this_name]={'pid':pid, 'is_running':str(p.is_running())}
-    return data_hash
-
+if zk.exists(path + ip)==None:
+    zk.create(path + ip,'', ephemeral=True)
+ 
 while True:
-    
-    try:
-        print path,sorted(addresses)
-        time.sleep(2)
-        change=False
-        if change:
-            os.system('sh /var/solo.sh')
-    #     if process_list:
-    #         data_hash = get_process(process_list)
-            #data.set(data_hash)
-            print 'updated data:', data_hash
-        sys.stdout.flush()
-        sys.stderr.flush()
-    except Exception as e:
-        print 'while:', str(e)
-        zk = None
-        while zk==None:
-            zk = get_zk_conn()
-        addresses,data = register_node(zk,node,ip)
-        
+    children = zk.get_children(path)
+    print path,list(children)
+    sys.stdout.flush()
+    sys.stderr.flush()
+    time.sleep(.5)
+ 
         
     
     
