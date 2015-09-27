@@ -65,6 +65,8 @@ if zk.exists(path + ip)==None:
 while True:
     children = zk.get_children(path)
     print path,list(children)
+    if ip not in list(children):
+        zk.create(path + ip,'', ephemeral=True)
     sys.stdout.flush()
     sys.stderr.flush()
     time.sleep(.5)
