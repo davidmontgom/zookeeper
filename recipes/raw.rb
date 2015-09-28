@@ -68,14 +68,14 @@ elif prefix.has_key('3')==False:
 else:
   this_prefix = '4' 
   
-if not os.path.isfile('/var/zookeeper-#{version}/conf/myid'): 
+if not os.path.isfile('/var/lib/zookeeper/myid'): 
   os.system("touch /var/lib/zookeeper/myid")
-  cmd = """echo '%s' | tee -a /var/zookeeper-#{version}/conf/myid""" % this_prefix
+  cmd = """echo '%s' | tee -a /var/lib/zookeeper/myid""" % this_prefix
   os.system(cmd)
   
 this_host = this_prefix + '.' + base_domain
 this_host = 'server.%s' % this_prefix
-host_list[this_host]=this_ip
+host_list[this_host]=this_prefix + '.' + base_domain
 
 with open('/var/zookeeper_hosts.json', 'w') as fp:
   json.dump(host_list, fp)
