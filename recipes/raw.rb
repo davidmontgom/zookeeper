@@ -47,6 +47,7 @@ conn = Route53Connection('#{AWS_ACCESS_KEY_ID}', '#{AWS_SECRET_ACCESS_KEY}')
 records = conn.get_all_rrsets('#{zone_id}')
 host_list = {}
 prefix={}
+prefix_ip_hash = {}
 root = None
 for record in records:
   if record.name.find('zk')>=0 and record.name.find('#{location}')>=0 and record.name.find('#{datacenter}')>=0 and record.name.find('#{node.chef_environment}')>=0:
@@ -55,6 +56,7 @@ for record in records:
       p = record.name.split('.')[0]
       prefix[p]=1
       root = record.name[:-1]
+      prefix_ip_hash[p]=record.resource_records[0]
 
 
 this_ip = '#{node[:ipaddress]}'
@@ -67,6 +69,7 @@ elif prefix.has_key('3')==False:
   this_prefix = '3'
 else:
   this_prefix = '4' 
+prefix_ip_hash[this_prefix]='#{node[:ipaddress]}'
   
 if not os.path.isfile('/var/lib/zookeeper/myid'): 
   os.system("touch /var/lib/zookeeper/myid")
@@ -89,8 +92,8 @@ if not os.path.isfile(hash_file):
     pass
   os.system('touch %s' % hash_file)
   f = open('/var/zookeeper_hosts','w')
-  for k,v in host_list.iteritems():
-      f.write(k + "=" + v + ":2888:3888")
+  for k,v in prefix_ip_hash.iteritems():
+      f.write('server.%s=%s:2888:3888' % (k,v)
       f.write("""\n""")
   f.close()
   
