@@ -93,7 +93,7 @@ if not os.path.isfile(hash_file):
   os.system('touch %s' % hash_file)
   f = open('/var/zookeeper_hosts','w')
   for k,v in prefix_ip_hash.iteritems():
-      f.write('server.%s=%s:2888:3888' % (k,v)
+      f.write('server.%s=%s:2888:3888' % (k,v))
       f.write("""\n""")
   f.close()
   
