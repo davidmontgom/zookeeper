@@ -72,6 +72,8 @@ else:
 prefix_ip_hash[this_prefix]='#{node[:ipaddress]}'
   
 if not os.path.isfile('/var/lib/zookeeper/myid'): 
+  os.system("mkdir -p /var/lib/zookeeper/")
+  os.system("chmod 751 -p /var/lib/zookeeper/")
   os.system("touch /var/lib/zookeeper/myid")
   cmd = """echo '%s' | tee -a /var/lib/zookeeper/myid""" % this_prefix
   os.system(cmd)
