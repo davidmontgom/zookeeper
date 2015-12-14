@@ -178,3 +178,30 @@ end
 
 
 
+#logrotate -d -f /etc/logrotate.d/zookeeper-rotate 
+#/var/lib/zookeeper/version-2/
+=begin
+logrotate_app "zookeeper-rotate" do
+  cookbook "logrotate"
+  path ["/var/lib/zookeeper/version-2/log.*","/var/lib/zookeeper/version-2/snapshot.*"]
+  frequency "daily"
+  rotate 1
+  #size "10M"
+  create "644 root root"
+end
+=end
+
+
+cron 'noop_log' do
+  hour '5'
+  minute '0'
+  command '/bin/rm /var/lib/zookeeper/version-2/log.* 2>/dev/null'
+end
+
+cron 'noop_status' do
+  hour '5'
+  minute '0'
+  command '/bin/rm /var/lib/zookeeper/version-2/status.* 2>/dev/null'
+end
+
+
