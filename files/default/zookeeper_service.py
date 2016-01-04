@@ -32,14 +32,8 @@ node_meta = node.split('-')
 node = node_meta[:-1]
 node = '-'.join(node)
 
-server_type = node_meta[0]
-environment = node_meta[2]
-dataceter = node_meta[1]
-location = node_meta[3]
+#aws-east-development-trade-zookeeper
 
-if os.path.isfile('/var/shard.txt'):
-    shard = open('/var/shard.txt').readlines()[0].strip()
-    node = "%s-%s" % (node,shard)
 
 if environment=='local':
     ip='127.0.0.1'

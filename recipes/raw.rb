@@ -23,7 +23,7 @@ easy_install_package "boto" do
 end
 
 
-version = '3.4.6'
+version = '3.4.7'
 bash "install_zookeeper" do
   user "root"
   cwd "/var"
