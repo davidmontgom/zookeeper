@@ -35,9 +35,6 @@ node = '-'.join(node)
 #aws-east-development-trade-zookeeper
 
 
-if environment=='local':
-    ip='127.0.0.1'
-
 for i in xrange(len(zk_host_list)):
     zk_host_list[i]=zk_host_list[i]+':2181' 
 zk_host_str = ','.join(zk_host_list)
