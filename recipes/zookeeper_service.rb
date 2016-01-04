@@ -17,16 +17,17 @@ subdomain = zookeeper_server[datacenter][environment][location]['subdomain']
 required_count = zookeeper_server[datacenter][environment][location]['required_count']
 full_domain = "#{subdomain}.#{domain}"
 
+
+#This is becuase aws uses SG
 if datacenter!='aws'
-  do_cloud = data_bag_item("my_data_bag", "do")
-  keypair = do_cloud[datacenter][node.chef_environment]["keypair"]
-  username=do_cloud["username"]
+  dc_cloud = data_bag_item("my_data_bag", "#{datacenter}")
+  keypair = dc_cloud[datacenter][node.chef_environment]["keypair"]
+  username = dc_cloud["username"]
 end
 
 zookeeper_hosts = "1.#{subdomain}.#{domain}"
 
 zk_process_monitor_list = node['zk_process_monitor']
-
 #zookeeper_hosts = File.write("/var/zookeeper_hosts")
 #File.open("/tmp/zookeeper_hosts.json","w") do |f|
 #  f.write(zk_hosts.to_json)
@@ -44,11 +45,7 @@ easy_install_package "paramiko" do
   action :install
 end
 
-=begin
-if new zk node then:
-  add this to them
-  add them to this
-=end
+
 
 if datacenter!='local' and datacenter!='aws'
   script "zookeeper_add" do
