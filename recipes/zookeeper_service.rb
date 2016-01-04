@@ -23,7 +23,7 @@ if datacenter!='aws'
   username=do_cloud["username"]
 end
 
-
+zookeeper_hosts = "1.#{subdomain}.#{domain}"
 
 zk_process_monitor_list = node['zk_process_monitor']
 
@@ -88,7 +88,7 @@ script "zookeeper_files" do
 code <<-PYCODE
 import json
 f = open('/var/zookeeper_hosts.json','w')
-f.write('#{zk_hosts}')
+f.write('#{zookeeper_hosts}')
 f.close()
 
 f = open('/var/zookeeper_node_name.json','w')
