@@ -25,7 +25,7 @@ if datacenter!='aws'
   username = dc_cloud["username"]
 end
 
-zookeeper_hosts = "1.#{subdomain}.#{domain}"
+#zookeeper_hosts = "1.#{subdomain}.#{domain}"
 
 zk_process_monitor_list = node['zk_process_monitor']
 #zookeeper_hosts = File.write("/var/zookeeper_hosts")
@@ -84,8 +84,14 @@ script "zookeeper_files" do
   user "root"
 code <<-PYCODE
 import json
+
+zookeeper_hosts = []
+for i in xrange(int(#{required_count})):
+    zookeeper_hosts.append("%s.#{full_domain}" % (i+1))
+zookeeper_hosts = ','.join(zookeeper_hosts)
+
 f = open('/var/zookeeper_hosts.json','w')
-f.write('#{zookeeper_hosts}')
+f.write(zookeeper_hosts)
 f.close()
 
 f = open('/var/zookeeper_node_name.json','w')
