@@ -1,20 +1,26 @@
 datacenter = node.name.split('-')[0]
-server_type = node.name.split('-')[1]
-location = node.name.split('-')[2]
+location = node.name.split('-')[1]
+environment = node.name.split('-')[2]
+slug = node.name.split('-')[3] 
+server_type = node.name.split('-')[4]
+
+data_bag("meta_data_bag")
+aws = data_bag_item("meta_data_bag", "aws")
+domain = aws[node.chef_environment]["route53"]["domain"]
+zone_id = aws[node.chef_environment]["route53"]["zone_id"]
+AWS_ACCESS_KEY_ID = aws[node.chef_environment]['AWS_ACCESS_KEY_ID']
+AWS_SECRET_ACCESS_KEY = aws[node.chef_environment]['AWS_SECRET_ACCESS_KEY']
+
+data_bag("server_data_bag")
+zookeeper_server = data_bag_item("server_data_bag", "zookeeper")
+subdomain = zookeeper_server[datacenter][environment][location]['subdomain']
+required_count = zookeeper_server[datacenter][environment][location]['required_count']
+full_domain = "#{subdomain}.#{domain}"
   
-data_bag("my_data_bag")
-db = data_bag_item("my_data_bag", "my")
-AWS_ACCESS_KEY_ID = db[node.chef_environment]['aws']['AWS_ACCESS_KEY_ID']
-AWS_SECRET_ACCESS_KEY = db[node.chef_environment]['aws']['AWS_SECRET_ACCESS_KEY']
-zone_id = db[node.chef_environment]['aws']['route53']['zone_id']
-domain = db[node.chef_environment]['aws']['route53']['domain']
-
-
+  
 easy_install_package "boto" do
   action :install
 end
-
-
 
 
 version = '3.4.6'
@@ -50,7 +56,7 @@ prefix={}
 prefix_ip_hash = {}
 root = None
 for record in records:
-  if record.name.find('zk')>=0 and record.name.find('#{location}')>=0 and record.name.find('#{datacenter}')>=0 and record.name.find('#{node.chef_environment}')>=0:
+  if record.name.find('#{subdomain}')>=0:
     if record.resource_records[0]!='#{node[:ipaddress]}':
       host_list[record.name]=record.resource_records[0]
       p = record.name.split('.')[0]
@@ -60,15 +66,17 @@ for record in records:
 
 
 this_ip = '#{node[:ipaddress]}'
-base_domain = 'zk.#{datacenter}.#{node.chef_environment}.#{location}.#{domain}'
+base_domain = '#{full_domain}'
 if prefix.has_key('1')==False:
   this_prefix = '1'
 elif prefix.has_key('2')==False:
   this_prefix = '2'
 elif prefix.has_key('3')==False:
   this_prefix = '3'
+elif prefix.has_key('4')==False:
+  this_prefix = '4'
 else:
-  this_prefix = '4' 
+  this_prefix = '5' 
 prefix_ip_hash[this_prefix]='#{node[:ipaddress]}'
   
 if not os.path.isfile('/var/lib/zookeeper/myid'): 
