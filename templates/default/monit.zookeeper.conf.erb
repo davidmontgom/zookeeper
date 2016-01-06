@@ -1,5 +1,5 @@
-#monit procmatch ".*/usr/lib/jvm/java-7-openjdk-amd64/bin/java -Dzookeeper*"
+#monit procmatch ".*java -Dzookeeper.log.dir=.*"
 check process zookeeper
-	with matching ".*/usr/lib/jvm/java-7-openjdk-amd64/bin/java -Dzookeeper*"
+	with matching ".*java -Dzookeeper.log.dir=.*"
 	start program = "/usr/local/bin/supervisorctl start zookeeper_server:"
 	stop program = "/usr/local/bin/supervisorctl stop zookeeper_server:"
