@@ -20,8 +20,8 @@ full_domain = "#{subdomain}.#{domain}"
 
 #This is becuase aws uses SG
 if datacenter!='aws'
-  dc_cloud = data_bag_item("my_data_bag", "#{datacenter}")
-  keypair = dc_cloud[datacenter][node.chef_environment]["keypair"]
+  dc_cloud = data_bag_item("meta_data_bag", "#{datacenter}")
+  keypair = dc_cloud[node.chef_environment]["keypair"]
   username = dc_cloud["username"]
 end
 
