@@ -16,19 +16,19 @@ end
 
 
 
-
-version = '3.4.6'
+version = '3.4.7'
 bash "install_zookeeper" do
   user "root"
   cwd "/var"
   code <<-EOH
-  wget http://mirrors.koehn.com/apache/zookeeper/stable/zookeeper-#{version}.tar.gz
+  wget http://www.us.apache.org/dist/zookeeper/zookeeper-#{version}/zookeeper-#{version}.tar.gz
   tar -xvf zookeeper-#{version}.tar.gz
   #mv zookeeper-#{version}.tar.gz zookeeper
   EOH
   action :run
   not_if {File.exists?("/var/zookeeper-#{version}")}
 end
+
 
 
 script "zookeeper_myid" do
