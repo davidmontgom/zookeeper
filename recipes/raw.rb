@@ -1,8 +1,9 @@
 datacenter = node.name.split('-')[0]
-location = node.name.split('-')[1]
-environment = node.name.split('-')[2]
-slug = node.name.split('-')[3] 
-server_type = node.name.split('-')[4]
+environment = node.name.split('-')[1]
+location = node.name.split('-')[2]
+server_type = node.name.split('-')[3]
+slug = node.name.split('-')[4] 
+cluster_slug = File.read("/var/cluster_slug.txt")
 
 data_bag("meta_data_bag")
 aws = data_bag_item("meta_data_bag", "aws")
@@ -13,8 +14,8 @@ AWS_SECRET_ACCESS_KEY = aws[node.chef_environment]['AWS_SECRET_ACCESS_KEY']
 
 data_bag("server_data_bag")
 zookeeper_server = data_bag_item("server_data_bag", "zookeeper")
-subdomain = zookeeper_server[datacenter][environment][location]['subdomain']
-required_count = zookeeper_server[datacenter][environment][location]['required_count']
+subdomain = zookeeper_server[datacenter][environment][location][cluster_slug]['subdomain']
+required_count = zookeeper_server[datacenter][environment][location][cluster_slug]['required_count']
 full_domain = "#{subdomain}.#{domain}"
   
   
@@ -59,7 +60,7 @@ for record in records:
   if record.name.find('#{subdomain}')>=0:
     if record.resource_records[0]!='#{node[:ipaddress]}':
       host_list[record.name]=record.resource_records[0]
-      p = record.name.split('.')[0]
+      p = record.name.split('-')[0]
       prefix[p]=1
       root = record.name[:-1]
       prefix_ip_hash[p]=record.resource_records[0]
@@ -86,9 +87,9 @@ if not os.path.isfile('/var/lib/zookeeper/myid'):
   cmd = """echo '%s' | tee -a /var/lib/zookeeper/myid""" % this_prefix
   os.system(cmd)
   
-this_host = this_prefix + '.' + base_domain
+this_host = this_prefix + '-' + base_domain
 this_host = 'server.%s' % this_prefix
-host_list[this_host]=this_prefix + '.' + base_domain
+host_list[this_host]=this_prefix + '-' + base_domain
 
 with open('/var/zookeeper_hosts.json', 'w') as fp:
   json.dump(host_list, fp)

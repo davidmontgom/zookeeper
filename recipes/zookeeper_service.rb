@@ -1,8 +1,9 @@
 datacenter = node.name.split('-')[0]
-location = node.name.split('-')[1]
-environment = node.name.split('-')[2]
-slug = node.name.split('-')[3] 
-server_type = node.name.split('-')[4]
+environment = node.name.split('-')[1]
+location = node.name.split('-')[2]
+server_type = node.name.split('-')[3]
+slug = node.name.split('-')[4] 
+cluster_slug = File.read("/var/cluster_slug.txt")
 
 data_bag("meta_data_bag")
 aws = data_bag_item("meta_data_bag", "aws")
@@ -13,8 +14,8 @@ AWS_SECRET_ACCESS_KEY = aws[node.chef_environment]['AWS_SECRET_ACCESS_KEY']
 
 data_bag("server_data_bag")
 zookeeper_server = data_bag_item("server_data_bag", "zookeeper")
-subdomain = zookeeper_server[datacenter][environment][location]['subdomain']
-required_count = zookeeper_server[datacenter][environment][location]['required_count']
+subdomain = zookeeper_server[datacenter][environment][location][cluster_slug]['subdomain']
+required_count = zookeeper_server[datacenter][environment][location][cluster_slug]['required_count']
 full_domain = "#{subdomain}.#{domain}"
 
 
@@ -56,7 +57,7 @@ import paramiko
 username='#{username}'
 zookeeper_hosts = []
 for i in xrange(int(#{required_count})):
-    zookeeper_hosts.append("%s.#{full_domain}" % (i+1))
+    zookeeper_hosts.append("%s-#{full_domain}" % (i+1))
 
 ip_address_list = zookeeper_hosts
 if len(ip_address_list)>=1:
