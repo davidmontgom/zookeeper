@@ -95,7 +95,7 @@ import json
 
 zookeeper_hosts = []
 for i in xrange(int(#{required_count})):
-    zookeeper_hosts.append("%s.#{full_domain}" % (i+1))
+    zookeeper_hosts.append("%s-#{full_domain}" % (i+1))
 zookeeper_hosts = ','.join(zookeeper_hosts)
 
 f = open('/var/zookeeper_hosts.json','w')
