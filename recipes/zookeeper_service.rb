@@ -6,7 +6,6 @@ slug = node.name.split('-')[4]
 cluster_slug = File.read("/var/cluster_slug.txt")
 cluster_slug = cluster_slug.gsub(/\n/, "") 
 
-
 data_bag("meta_data_bag")
 aws = data_bag_item("meta_data_bag", "aws")
 domain = aws[node.chef_environment]["route53"]["domain"]
@@ -15,12 +14,14 @@ AWS_ACCESS_KEY_ID = aws[node.chef_environment]['AWS_ACCESS_KEY_ID']
 AWS_SECRET_ACCESS_KEY = aws[node.chef_environment]['AWS_SECRET_ACCESS_KEY']
 
 
-this_server = data_bag_item("server_data_bag", server_type)
-cluster_map = this_server[datacenter][environment][location][cluster_slug]['cluster_map']
-if cluster_map.has_key?("zookeeper")
-  cluster_slug_zookeeper = cluster_map["zookeeper"]
+
+data_bag("server_data_bag")
+zookeeper_server = data_bag_item("server_data_bag", "zookeeper")
+
+if zookeeper_server[datacenter][environment][location].has_key?(cluster_slug)
+  cluster_slug_zookeeper = cluster_slug
 else
-  cluster_slug_zookeeper="nocluster"
+  cluster_slug_zookeeper = "nocluster"
 end
 
 if cluster_slug_zookeeper=="nocluster"
@@ -29,7 +30,6 @@ else
   subdomain = "#{cluster_slug_zookeeper}-zookeeper-#{datacenter}-#{environment}-#{location}-#{slug}"
 end
 
-zookeeper_server = data_bag_item("server_data_bag", "zookeeper")
 required_count = zookeeper_server[datacenter][environment][location][cluster_slug_zookeeper]['required_count']
 full_domain = "#{subdomain}.#{domain}"
 
