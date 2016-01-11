@@ -29,6 +29,7 @@ else
   subdomain = "#{cluster_slug_zookeeper}-zookeeper-#{datacenter}-#{environment}-#{location}-#{slug}"
 end
 
+zookeeper_server = data_bag_item("server_data_bag", "zookeeper")
 required_count = zookeeper_server[datacenter][environment][location][cluster_slug_zookeeper]['required_count']
 full_domain = "#{subdomain}.#{domain}"
 
