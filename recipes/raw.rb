@@ -38,9 +38,11 @@ bash "install_zookeeper" do
   wget http://www.us.apache.org/dist/zookeeper/zookeeper-#{version}/zookeeper-#{version}.tar.gz
   tar -xvf zookeeper-#{version}.tar.gz
   #mv zookeeper-#{version}.tar.gz zookeeper
+  touch /var/chef/cache/zk.lock
   EOH
   action :run
-  not_if {File.exists?("/var/zookeeper-#{version}")}
+  #not_if {File.exists?("/var/zookeeper-#{version}")}
+  not_if {File.exists?("/var/chef/cache/zk.lock")}
 end
 
 
