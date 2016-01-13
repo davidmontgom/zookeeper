@@ -1,4 +1,4 @@
 default[:monit][:server_type]='zookeeper'
-default['zookeeper']['version']='3.4.7'
+default['zookeeper']['version']='3.4.6'
 
 
