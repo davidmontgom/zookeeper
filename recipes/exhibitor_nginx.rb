@@ -6,6 +6,10 @@ location = node.name.split('-')[4]
 cluster_slug = File.read("/var/cluster_slug.txt")
 cluster_slug = cluster_slug.gsub(/\n/, "") 
 
+data_bag("meta_data_bag")
+aws = data_bag_item("meta_data_bag", "aws")
+domain = aws[node.chef_environment]["route53"]["domain"]
+
 zookeeper_server = data_bag_item("server_data_bag", "zookeeper")
 if zookeeper_server[datacenter][environment][location].has_key?(cluster_slug)
   cluster_slug_zookeeper = cluster_slug
