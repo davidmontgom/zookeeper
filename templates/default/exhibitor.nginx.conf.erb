@@ -1,0 +1,11 @@
+server {
+                listen 82;
+                #listen [::]:80 ipv6only=on default_server;
+                server_name 127.0.0.1;
+
+location / {
+	  proxy_pass http://1-zookeeper-aws-development-east-forex.forexhui.com:8080;
+	  #auth_basic "Restricted";
+	  #auth_basic_user_file /etc/nginx/.htpasswd;
+  }
+}
