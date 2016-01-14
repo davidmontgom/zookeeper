@@ -27,7 +27,7 @@ end
 if cluster_slug_zookeeper=="nocluster"
   subdomain = "zookeeper-#{slug}-#{datacenter}-#{environment}-#{location}"
 else
-  subdomain = "#{cluster_slug_zookeeper}-zookeeper-#{slug}-#{datacenter}-#{environment}-#{location}"
+  subdomain = "zookeeper-#{slug}-#{datacenter}-#{environment}-#{location}-#{cluster_slug_zookeeper}"
 end
 
 required_count = zookeeper_server[datacenter][environment][location][cluster_slug_zookeeper]['required_count']

@@ -19,7 +19,7 @@ zookeeper_server = data_bag_item("server_data_bag", "zookeeper")
 if cluster_slug=="nocluster"
   subdomain = "zookeeper-#{slug}-#{datacenter}-#{environment}-#{location}"
 else
-  subdomain = "#{cluster_slug}-zookeeper-#{slug}-#{datacenter}-#{environment}-#{location}"
+  subdomain = "zookeeper-#{slug}-#{datacenter}-#{environment}-#{location}-#{cluster_slug}"
 end
 required_count = zookeeper_server[datacenter][environment][location][cluster_slug]['required_count']
 full_domain = "#{subdomain}.#{domain}"
