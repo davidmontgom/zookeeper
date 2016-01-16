@@ -57,9 +57,11 @@ cluster_index = None
 if os.path.exists('/var/cluster_index.txt'):
     cluster_index = open('/var/cluster_index.txt').readlines()[0].strip()
     
-data = zk.properties(path + ip)
-cluster_info = {'cluster_index': cluster_index}
-data.update(cluster_info)
+# data = zk.properties(path + ip)
+# cluster_info = {'cluster_index': cluster_index}
+# data.update(cluster_info)
+
+zk.set(path + ip, cluster_info)
  
 while True:
     try:
