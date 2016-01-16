@@ -5,6 +5,7 @@ import json
 import os
 import sys
 import psutil
+import json
 import logging #https://kazoo.readthedocs.org/en/latest/basic_usage.html
 logging.basicConfig()
 """
@@ -56,12 +57,15 @@ if zk.exists(path + ip)==None:
 cluster_index = None
 if os.path.exists('/var/cluster_index.txt'):
     cluster_index = open('/var/cluster_index.txt').readlines()[0].strip()
+    data = {'cluster_index':cluster_index}
+    data = json.dumps(data)
+    zk.set(path + ip, data)
     
 # data = zk.properties(path + ip)
 # cluster_info = {'cluster_index': cluster_index}
 # data.update(cluster_info)
 
-zk.set(path + ip, cluster_info)
+
  
 while True:
     try:
