@@ -52,6 +52,14 @@ if zk.exists(path)==None:
 
 if zk.exists(path + ip)==None:
     zk.create(path + ip,'', ephemeral=True)
+    
+cluster_index = None
+if os.path.exists('/var/cluster_index.txt'):
+    cluster_index = open('/var/cluster_index.txt').readlines()[0].strip()
+    
+data = zk.properties(path + ip)
+cluster_info = {'cluster_index': cluster_index}
+data.update(cluster_info)
  
 while True:
     try:
@@ -63,7 +71,7 @@ while True:
         zk.create(path + ip,'', ephemeral=True)
     sys.stdout.flush()
     sys.stderr.flush()
-    time.sleep(.5)
+    time.sleep(1)
  
         
     

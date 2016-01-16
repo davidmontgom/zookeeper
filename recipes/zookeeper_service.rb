@@ -127,6 +127,7 @@ end
 cookbook_file "/var/zookeeper_service.py" do
   source "zookeeper_service.py"
   mode 00744
+  notifies :restart, resources(:service => "supervisord")
 end
 
 template "/etc/supervisor/conf.d/supervisord.zookeeper.health.include.conf" do
