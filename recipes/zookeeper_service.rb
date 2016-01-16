@@ -123,11 +123,16 @@ f.close()
 PYCODE
 end
 
+execute "restart_zookeeper_health" do
+  command "sudo supervisorctl restart zookeeper_health_server:"
+  action :nothing
+end
  
 cookbook_file "/var/zookeeper_service.py" do
   source "zookeeper_service.py"
   mode 00744
-  notifies :restart, resources(:service => "supervisord")
+  notifies :run, "execute[restart_zookeeper_health]"
+  #notifies :restart, resources(:service => "supervisord")
 end
 
 template "/etc/supervisor/conf.d/supervisord.zookeeper.health.include.conf" do
