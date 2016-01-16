@@ -54,19 +54,19 @@ if zk.exists(path)==None:
 if zk.exists(path + ip)==None:
     zk.create(path + ip,'', ephemeral=True)
     
-cluster_index = None
-if os.path.exists('/var/cluster_index.txt'):
-    cluster_index = open('/var/cluster_index.txt').readlines()[0].strip()
-    data = {'cluster_index':cluster_index}
-    data = json.dumps(data)
-    res = zk.set(path + ip, data)
-    print 'node data:',data
-    print 'path:',path + ip
-    print 'res:',res
     
-# data = zk.properties(path + ip)
-# cluster_info = {'cluster_index': cluster_index}
-# data.update(cluster_info)
+def add_data():
+    cluster_index = None
+    if os.path.exists('/var/cluster_index.txt'):
+        cluster_index = open('/var/cluster_index.txt').readlines()[0].strip()
+        data = {'cluster_index':cluster_index}
+        data = json.dumps(data)
+        res = zk.set(path + ip, data)
+        print 'node data:',data
+        print 'path:',path + ip
+        print 'res:',res
+add_data()
+
 
 
  
@@ -76,6 +76,7 @@ while True:
     except:
         zk = get_zk_conn()
     print path,list(children)
+    add_data()
     if ip not in list(children):
         zk.create(path + ip,'', ephemeral=True)
     sys.stdout.flush()
