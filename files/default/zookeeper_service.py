@@ -60,6 +60,7 @@ if os.path.exists('/var/cluster_index.txt'):
     data = {'cluster_index':cluster_index}
     data = json.dumps(data)
     zk.set(path + ip, data)
+    print 'node data:',data
     
 # data = zk.properties(path + ip)
 # cluster_info = {'cluster_index': cluster_index}
