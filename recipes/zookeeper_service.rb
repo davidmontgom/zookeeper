@@ -61,6 +61,10 @@ easy_install_package "paramiko" do
   action :install
 end
 
+easy_install_package "dnspython" do
+  action :install
+end
+
 
 
 if datacenter!='local' and datacenter!='aws'

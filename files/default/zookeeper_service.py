@@ -1,5 +1,6 @@
 import zc.zk
 from kazoo.client import KazooClient
+import dns.resolver
 import time
 import json
 import os
@@ -14,39 +15,49 @@ logging.basicConfig()
 2) register server
 3) If change in servers then rerun chef
 """
-# with open('/tmp/zookeeper_hosts') as f:
-#     zk_host_list = json.load(f)
- 
-#
 
-#zk_host_list = '107.170.219.233'
-zk_host_list = open('/var/zookeeper_hosts.json').readlines()[0]
-zk_host_list = zk_host_list.split(',')
+def get_zk_host_list():
+    zk_host_list_dns = open('/var/zookeeper_hosts.json').readlines()[0]
+    zk_host_list_dns = zk_host_list.split(',')
+    zk_host_list = []
+    for aname in zk_host_list_dns:
+        try:
+            data =  dns.resolver.query(aname, 'A')
+            zk_host_list.append(data[0])
+        except:
+            print 'ERROR, dns.resolver.NXDOMAIN',aname
+    return zk_host_list
+
+def get_zk_host_str(zk_host_list):
+    for i in xrange(len(zk_host_list)):
+        zk_host_list[i]=zk_host_list[i]+':2181' 
+    zk_host_str = ','.join(zk_host_list)
+
+# zk_host_list = get_zk_host_list()
+# zk_host_str = get_zk_host_str(zk_host_list)
+
 temp = open('/var/zookeeper_node_name.json').readlines()[0]
 node,ip = temp.split(' ')
-
-# node = 'do-fu-sf-development'
-# ip = '111.111.111.111'
-# print node,ip
-
 node_meta = node.split('-')
 node = node_meta[:-1]
 node = '-'.join(node)
-
-#aws-east-development-trade-zookeeper
-
-
-for i in xrange(len(zk_host_list)):
-    zk_host_list[i]=zk_host_list[i]+':2181' 
-zk_host_str = ','.join(zk_host_list)
 path = '/%s/' % (node)
-  
 
 def get_zk_conn():
-    zk = KazooClient(hosts=zk_host_str, read_only=True)
-    zk.start()
+    zk_host_list = get_zk_host_list()
+    if zk_host_list:
+        zk_host_str = get_zk_host_str(zk_host_list)
+        zk = KazooClient(hosts=zk_host_str, read_only=True)
+        zk.start()
+    else:
+        zk = None
+        print 'waiting for zk conn...'
+        time.sleep(1)
     return zk
-zk = get_zk_conn()
+
+zk = None
+while zk==None:
+    zk = get_zk_conn()
  
 if zk.exists(path)==None:
     zk.create(path,'', ephemeral=False)
@@ -54,8 +65,7 @@ if zk.exists(path)==None:
 if zk.exists(path + ip)==None:
     zk.create(path + ip,'', ephemeral=True)
     
-    
-def add_data():
+def add_data(zk):
     cluster_index = None
     if os.path.exists('/var/cluster_index.txt'):
         cluster_index = open('/var/cluster_index.txt').readlines()[0].strip()
@@ -65,7 +75,8 @@ def add_data():
         print 'node data:',data
         print 'path:',path + ip
         print 'res:',res
-add_data()
+
+add_data(zk)
 
 
 
@@ -76,7 +87,7 @@ while True:
     except:
         zk = get_zk_conn()
     print path,list(children)
-    add_data()
+    add_data(zk)
     if ip not in list(children):
         zk.create(path + ip,'', ephemeral=True)
     sys.stdout.flush()
