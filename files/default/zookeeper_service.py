@@ -1,6 +1,7 @@
 import zc.zk
 from kazoo.client import KazooClient
 import dns.resolver
+import hashlib
 import time
 import json
 import os
@@ -15,6 +16,7 @@ logging.basicConfig()
 2) register server
 3) If change in servers then rerun chef
 """
+zk_chksum_init = hashlib.md5(open('/var/zookeeper_hosts.json', 'rb').read()).hexdigest()
 
 def get_zk_host_list():
     zk_host_list_dns = open('/var/zookeeper_hosts.json').readlines()[0]
@@ -81,6 +83,10 @@ add_data(zk)
 
  
 while True:
+    zk_chksum = hashlib.md5(open('/var/zookeeper_hosts.json', 'rb').read()).hexdigest()
+    if zk_chksum!=zk_chksum:
+        zk = get_zk_conn()
+        
     try:
         children = zk.get_children(path)
     except:
