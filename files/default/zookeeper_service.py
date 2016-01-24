@@ -18,20 +18,19 @@ logging.basicConfig()
 
 def get_zk_host_list():
     zk_host_list_dns = open('/var/zookeeper_hosts.json').readlines()[0]
-    zk_host_list_dns = zk_host_list.split(',')
+    zk_host_list_dns = zk_host_list_dns.split(',')
     zk_host_list = []
     for aname in zk_host_list_dns:
         try:
             data =  dns.resolver.query(aname, 'A')
-            zk_host_list.append(data[0])
+            zk_host_list.append(data[0].to_text()+':2181')
         except:
             print 'ERROR, dns.resolver.NXDOMAIN',aname
     return zk_host_list
 
 def get_zk_host_str(zk_host_list):
-    for i in xrange(len(zk_host_list)):
-        zk_host_list[i]=zk_host_list[i]+':2181' 
     zk_host_str = ','.join(zk_host_list)
+    return zk_host_str
 
 # zk_host_list = get_zk_host_list()
 # zk_host_str = get_zk_host_str(zk_host_list)
