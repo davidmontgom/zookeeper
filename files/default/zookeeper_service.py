@@ -16,6 +16,12 @@ logging.basicConfig()
 2) register server
 3) If change in servers then rerun chef
 """
+
+while os.path.exists('/var/chef/cache/zookeeper.ok')==False:
+    print 'waiting for OK...'
+    time.sleep(1)
+
+
 zk_chksum_init = hashlib.md5(open('/var/zookeeper_hosts.json', 'rb').read()).hexdigest()
 
 def get_zk_host_list():
