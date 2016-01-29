@@ -18,6 +18,7 @@ logging.basicConfig()
 """
 
 while os.path.exists('/var/chef/cache/zookeeper.ok')==False:
+    # This file is written only after the first successful chef run
     print 'waiting for OK...'
     time.sleep(1)
 
@@ -74,9 +75,15 @@ if zk.exists(path + ip)==None:
     
 def add_data(zk):
     cluster_index = None
+    data = {}
     if os.path.exists('/var/cluster_index.txt'):
         cluster_index = open('/var/cluster_index.txt').readlines()[0].strip()
-        data = {'cluster_index':cluster_index}
+        data['cluster_index']=cluster_index
+    if os.path.exists('/var/vpn_ip_address.txt'):
+        vpn_ip_address = open('/var/vpn_ip_address.txt').readlines()[0].strip()
+        data['vpn_ip_address']=vpn_ip_address
+    
+    if data:
         data = json.dumps(data)
         res = zk.set(path + ip, data)
         print 'node data:',data
@@ -105,6 +112,7 @@ while True:
     sys.stderr.flush()
     time.sleep(1)
  
+        
         
     
     
