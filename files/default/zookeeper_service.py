@@ -46,6 +46,7 @@ def get_zk_host_str(zk_host_list):
 
 temp = open('/var/zookeeper_node_name.json').readlines()[0]
 node,ip = temp.split(' ')
+node_name = node.strip()
 node_meta = node.split('-')
 node = node_meta[:-1]
 node = '-'.join(node)
@@ -83,6 +84,7 @@ def add_data(zk):
         vpn_ip_address = open('/var/vpn_ip_address.txt').readlines()[0].strip()
         data['vpn_ip_address']=vpn_ip_address
     
+    data['node_name']=node_name
     if data:
         data = json.dumps(data)
         res = zk.set(path + ip, data)
