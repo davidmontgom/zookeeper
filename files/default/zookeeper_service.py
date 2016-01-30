@@ -82,7 +82,7 @@ def add_data(zk):
         data['cluster_index']=cluster_index
     if os.path.exists('/var/vpn_ip_address.txt'):
         vpn_ip_address = open('/var/vpn_ip_address.txt').readlines()[0].strip()
-        data['vpn_ip_address']=vpn_ip_address
+        data['vpn_ip']=vpn_ip_address
     
     data['node_name']=node_name
     if data:
