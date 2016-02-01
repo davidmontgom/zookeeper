@@ -86,8 +86,12 @@ if len(ip_address_list)>=1:
       ssh = paramiko.SSHClient()
       ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
       try:
-        ssh.connect(ip_address, 22, username=username, pkey=key)
-        cmd = "sudo ufw allow from #{node[:ipaddress]} to any port 2181"
+        ssh.connect(ip_address, 22, username=username, pkey=key) 
+        cmd = "iptables -I INPUT -p tcp -s #{node[:ipaddress]} -j ACCEPT"
+        stdin, stdout, stderr = ssh.exec_command(cmd)
+        cmd = "iptables -I OUTPUT -p tcp -d  #{node[:ipaddress]} -j ACCEPT"
+        stdin, stdout, stderr = ssh.exec_command(cmd)
+        cmd = "/etc/init.d/iptables-persistent save"
         stdin, stdout, stderr = ssh.exec_command(cmd)
         out = stdout.read()
         err = stderr.read()
