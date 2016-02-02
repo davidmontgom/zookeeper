@@ -87,9 +87,9 @@ if len(ip_address_list)>=1:
       ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
       try:
         ssh.connect(ip_address, 22, username=username, pkey=key) 
-        cmd = "/sbin/iptables -I INPUT -p tcp -s #{node[:ipaddress]} -j ACCEPT"
+        cmd = "/sbin/iptables -A INPUT -p tcp -s #{node[:ipaddress]} -j ACCEPT"
         stdin, stdout, stderr = ssh.exec_command(cmd)
-        cmd = "/sbin/iptables -I OUTPUT -p tcp -d  #{node[:ipaddress]} -j ACCEPT"
+        cmd = "/sbin/iptables -A OUTPUT -p tcp -d  #{node[:ipaddress]} -j ACCEPT"
         stdin, stdout, stderr = ssh.exec_command(cmd)
         cmd = "/etc/init.d/iptables-persistent save"
         stdin, stdout, stderr = ssh.exec_command(cmd)
