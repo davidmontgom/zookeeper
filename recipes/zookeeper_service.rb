@@ -124,7 +124,7 @@ if len(ip_address_list)>=1:
           cmd = "/sbin/iptables -A INPUT -s %s -j ACCEPT" % (ip_address)
           os.system(cmd)
           
-      cmd = "iptables -C INPUT -s %s -j ACCEPT" % (ip_address)
+      cmd = "iptables -C OUTPUT -s %s -j ACCEPT" % (ip_address)
       p = subprocess.Popen(cmd, shell=True,stderr=subprocess.STDOUT,stdout=subprocess.PIPE,executable="/bin/bash")
       out = p.stdout.readline().strip()
       if out.find('iptables: Bad rule (does a matching rule exist in that chain?).')>=0:
