@@ -92,7 +92,7 @@ for aname in zookeeper_hosts:
   except:
       print 'ERROR, dns.resolver.NXDOMAIN',aname
 zk_host_str = ','.join(zk_host_list)    
-zk = zc.zk.ZooKeeper(zk_host_str) 
+#zk = zc.zk.ZooKeeper(zk_host_str) 
     
 ip_address_list = zookeeper_hosts
 if len(ip_address_list)>=1:
