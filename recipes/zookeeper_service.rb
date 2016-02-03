@@ -73,11 +73,26 @@ if datacenter!='local' and datacenter!='aws'
     user "root"
   code <<-PYCODE
 import paramiko
-username='#{username}'
+import subprocess
+import os
+import dns.resolver
+username='#{username}' 
 zookeeper_hosts = []
+zookeeper_ip_address_list = []
 for i in xrange(int(#{required_count})):
     zookeeper_hosts.append("%s-#{full_domain}" % (i+1))
+zk_host_list = []
 
+for aname in zookeeper_hosts:
+  try:
+      data =  dns.resolver.query(aname, 'A')
+      zk_host_list.append(data[0].to_text()+':2181')
+      zookeeper_ip_address_list.append(data[0].to_text())
+  except:
+      print 'ERROR, dns.resolver.NXDOMAIN',aname
+zk_host_str = ','.join(zk_host_list)    
+zk = zc.zk.ZooKeeper(zk_host_str) 
+    
 ip_address_list = zookeeper_hosts
 if len(ip_address_list)>=1:
   for ip_address in ip_address_list:
@@ -99,6 +114,22 @@ if len(ip_address_list)>=1:
       except:
         pass
       ssh.close()
+      
+  for ip_address in zookeeper_ip_address_list:
+      cmd = "iptables -C INPUT -s %s -j ACCEPT" % (ip_address)
+      p = subprocess.Popen(cmd, shell=True,stderr=subprocess.STDOUT,stdout=subprocess.PIPE,executable="/bin/bash")
+      out = p.stdout.readline().strip()
+      if out.find('iptables: Bad rule (does a matching rule exist in that chain?).')>=0:
+          cmd = "/sbin/iptables -A INPUT -s %s -j ACCEPT" % (ip_address)
+          os.system(cmd)
+          
+      cmd = "iptables -C INPUT -s %s -j ACCEPT" % (ip_address)
+      p = subprocess.Popen(cmd, shell=True,stderr=subprocess.STDOUT,stdout=subprocess.PIPE,executable="/bin/bash")
+      out = p.stdout.readline().strip()
+      if out.find('iptables: Bad rule (does a matching rule exist in that chain?).')>=0:
+          cmd = "/sbin/iptables -A OUTPUT -d  %s -j ACCEPT" % (ip_address)
+          os.system(cmd)
+          
 PYCODE
   end
 end
