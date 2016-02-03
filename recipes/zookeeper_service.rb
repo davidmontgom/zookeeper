@@ -76,6 +76,7 @@ import paramiko
 import subprocess
 import os
 import dns.resolver
+import zc.zk
 username='#{username}' 
 zookeeper_hosts = []
 zookeeper_ip_address_list = []
