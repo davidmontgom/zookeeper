@@ -103,9 +103,9 @@ if len(ip_address_list)>=1:
       ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
       try:
         ssh.connect(ip_address, 22, username=username, pkey=key) 
-        cmd = "/sbin/iptables -A INPUT -p tcp -s #{node[:ipaddress]} -j ACCEPT"
+        cmd = "/sbin/iptables -A INPUT -s #{node[:ipaddress]} -j ACCEPT"
         stdin, stdout, stderr = ssh.exec_command(cmd)
-        cmd = "/sbin/iptables -A OUTPUT -p tcp -d  #{node[:ipaddress]} -j ACCEPT"
+        cmd = "/sbin/iptables -A OUTPUT -d  #{node[:ipaddress]} -j ACCEPT"
         stdin, stdout, stderr = ssh.exec_command(cmd)
         cmd = "/etc/init.d/iptables-persistent save" 
         stdin, stdout, stderr = ssh.exec_command(cmd)
@@ -124,7 +124,7 @@ if len(ip_address_list)>=1:
           cmd = "/sbin/iptables -A INPUT -s %s -j ACCEPT" % (ip_address)
           os.system(cmd)
           
-      cmd = "iptables -C OUTPUT -s %s -j ACCEPT" % (ip_address)
+      cmd = "iptables -C OUTPUT -d %s -j ACCEPT" % (ip_address)
       p = subprocess.Popen(cmd, shell=True,stderr=subprocess.STDOUT,stdout=subprocess.PIPE,executable="/bin/bash")
       out = p.stdout.readline().strip()
       if out.find('iptables: Bad rule (does a matching rule exist in that chain?).')>=0:
