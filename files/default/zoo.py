@@ -64,7 +64,7 @@ class zookeeper(object):
         return zk
 
     def get_path(self):
-           
+        
         if self.cluster_slug=="nocluster" and self.shard==None:
             node = '%s-%s-%s-%s-%s' % (self.server_type,self.slug,self.datacenter,self.environment,self.location)
         if self.cluster_slug!="nocluster" and self.shard==None:
@@ -99,5 +99,99 @@ class zookeeper(object):
     def close(self):
         
         self.zk.close()
+      
+      
+      
+      
+      
+def iptables_remote(this_ip_address,ip_address_list,keypair,username,cmd_list=[]):
+    
+    if this_ip_address in ip_address_list:
+        ip_address_list.remove(this_ip_address)
+    
+    for ip_address in ip_address_list:
+       
+        keypair_path = '/root/.ssh/%s' % keypair
+        key = paramiko.RSAKey.from_private_key_file(keypair_path)
+        ssh = paramiko.SSHClient()
+        ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+        ssh.connect(ip_address, 22, username=username, pkey=key)
         
+        cmd = "iptables -C INPUT -s %s -j ACCEPT" % (this_ip_address)
+        stdin, stdout, stderr = ssh.exec_command(cmd)
+        error_list = stderr.readlines()
+        if error_list:
+            output = ' '.join(error_list)
+            if output.find('iptables: Bad rule (does a matching rule exist in that chain?).')>=0: 
+                cmd = "/sbin/iptables -A INPUT -s %s -j ACCEPT" % (this_ip_address)
+                print cmd
+                stdin, stdout, stderr = ssh.exec_command(cmd)
+                cmd = "rm /var/chef/cache/unicast_hosts"
+                stdin, stdout, stderr = ssh.exec_command(cmd)
+        
+        cmd = "iptables -C OUTPUT -d %s -j ACCEPT" % (this_ip_address)
+        stdin, stdout, stderr = ssh.exec_command(cmd)
+        error_list = stderr.readlines()
+        if error_list:
+            output = ' '.join(error_list)
+            if output.find('iptables: Bad rule (does a matching rule exist in that chain?).')>=0:
+                cmd = "/sbin/iptables -A OUTPUT -d %s -j ACCEPT" % (this_ip_address)
+                print cmd
+                stdin, stdout, stderr = ssh.exec_command(cmd)
+                cmd = "/etc/init.d/iptables-persistent save" 
+                stdin, stdout, stderr = ssh.exec_command(cmd)
+                
+        cmd = "/sbin/iptables -D INPUT -j LOGGING"
+        stdin, stdout, stderr = ssh.exec_command(cmd)
+        cmd = "/sbin/iptables -C INPUT -j LOGGING"
+        stdin, stdout, stderr = ssh.exec_command(cmd)
+        error_list = stderr.readlines()
+        if error_list:
+            output = ' '.join(error_list)
+            if output.find('iptables: No chain/target/match by that name.')>=0:
+                cmd = "/sbin/iptables -A INPUT -j LOGGING"
+                print cmd
+                stdin, stdout, stderr = ssh.exec_command(cmd)
+                cmd = "/etc/init.d/iptables-persistent save" 
+                stdin, stdout, stderr = ssh.exec_command(cmd)
+        
+        for cmd in cmd_list:
+            stdin, stdout, stderr = ssh.exec_command(cmd)
+            out = stdout.read()
+            err = stderr.read()
+        
+        ssh.close()
+
+
+def iptables_local(this_ip_address,ip_address_list):
+    
+    if this_ip_address in ip_address_list:
+        ip_address_list.remove(this_ip_address)
+    
+    for ip_address in ip_address_list:     
+        
+        cmd = "iptables -C INPUT -s %s -j ACCEPT" % (ip_address)
+        p = subprocess.Popen(cmd, shell=True,stderr=subprocess.STDOUT,stdout=subprocess.PIPE,executable="/bin/bash")
+        out = p.stdout.readline().strip()
+        if out.find('iptables: Bad rule (does a matching rule exist in that chain?).')>=0:
+            cmd = "/sbin/iptables -A INPUT -s %s -j ACCEPT" % (ip_address)
+            os.system(cmd)
+        
+        cmd = "iptables -C OUTPUT -d %s -j ACCEPT" % (ip_address)
+        p = subprocess.Popen(cmd, shell=True,stderr=subprocess.STDOUT,stdout=subprocess.PIPE,executable="/bin/bash")
+        out = p.stdout.readline().strip()
+        if out.find('iptables: Bad rule (does a matching rule exist in that chain?).')>=0:
+            cmd = "/sbin/iptables -A OUTPUT -d  %s -j ACCEPT" % (ip_address)
+            os.system(cmd)
+            
+        cmd = "/sbin/iptables -D INPUT -j LOGGING" 
+        p = subprocess.Popen(cmd, shell=True,stderr=subprocess.STDOUT,stdout=subprocess.PIPE,executable="/bin/bash")
+        cmd = "/sbin/iptables -C INPUT -j LOGGING" 
+        p = subprocess.Popen(cmd, shell=True,stderr=subprocess.STDOUT,stdout=subprocess.PIPE,executable="/bin/bash")
+        out = p.stdout.readline().strip()
+        if out.find('iptables: No chain/target/match by that name.')>=0:
+            cmd = "/sbin/iptables -A INPUT -j LOGGING"
+            os.system(cmd)
+    
+  
         
