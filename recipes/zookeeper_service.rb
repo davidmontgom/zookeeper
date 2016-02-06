@@ -93,9 +93,9 @@ for aname in zookeeper_hosts:
       print 'ERROR, dns.resolver.NXDOMAIN',aname
 zk_host_str = ','.join(zk_host_list)    
     
-ip_address_list = zookeeper_hosts
+
 if len(ip_address_list)>0:
-  for ip_address in ip_address_list:
+  for ip_address in zookeeper_ip_address_list:
     if ip_address != '#{node[:ipaddress]}':
       keypair_path = '/root/.ssh/#{keypair}'
       key = paramiko.RSAKey.from_private_key_file(keypair_path)
@@ -130,7 +130,7 @@ if len(ip_address_list)>0:
         pass
       ssh.close()
       
-for ip_address in ip_address_list:     
+for ip_address in zookeeper_ip_address_list:     
   if ip_address != '#{node[:ipaddress]}':
     cmd = "iptables -C INPUT -s %s -j ACCEPT" % (ip_address)
     p = subprocess.Popen(cmd, shell=True,stderr=subprocess.STDOUT,stdout=subprocess.PIPE,executable="/bin/bash")
