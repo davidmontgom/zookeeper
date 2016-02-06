@@ -94,7 +94,7 @@ for aname in zookeeper_hosts:
 zk_host_str = ','.join(zk_host_list)    
     
 
-if len(ip_address_list)>0:
+if len(zookeeper_ip_address_list)>0:
   for ip_address in zookeeper_ip_address_list:
     if ip_address != '#{node[:ipaddress]}':
       keypair_path = '/root/.ssh/#{keypair}'
@@ -181,6 +181,11 @@ end
 execute "restart_zookeeper_health" do
   command "sudo supervisorctl restart zookeeper_health_server:"
   action :nothing
+end
+
+cookbook_file "/var/zoo.py" do
+  source "zoo.py"
+  mode 00744
 end
  
 cookbook_file "/var/zookeeper_service.py" do
