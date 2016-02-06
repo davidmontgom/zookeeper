@@ -65,6 +65,10 @@ easy_install_package "dnspython" do
   action :install
 end
 
+cookbook_file "/var/zoo.py" do
+  source "zoo.py"
+  mode 00744
+end
 
 cookbook_file "/var/zookeeper_cluster.py" do
   source "zookeeper_cluster.py"
@@ -128,10 +132,7 @@ execute "restart_zookeeper_health" do
   action :nothing
 end
 
-cookbook_file "/var/zoo.py" do
-  source "zoo.py"
-  mode 00744
-end
+
  
 cookbook_file "/var/zookeeper_service.py" do
   source "zookeeper_service.py"

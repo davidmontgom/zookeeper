@@ -141,7 +141,7 @@ if __name__ == "__main__":
         f.write(line)
     f.close()
 
-    elasticearch(args)
+    zk_cluster(args)
 
 
 
