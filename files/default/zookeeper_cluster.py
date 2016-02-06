@@ -80,25 +80,29 @@ def iptables_local(this_ip_address,ip_address_list):
 def zk_cluster(args):
     
     zoo = zookeeper(args)
-    zk = zoo.get_conn()
-    path = zoo.get_zk_path()
+    zoo.get_zk_hostname()
+    ip_address_list = get_zk_ip_address()
+    #zk = zoo.get_conn()
+    #path = zoo.get_zk_path()
     
     ip_address = args.ip_address
     username = args.username
     keypair = args.keypair
     
-
-    #Get lists of zk ip address
-    if zk.exists(path):
-        addresses = zk.children(path)
-        ip_address_list = list(set(addresses))
-        
-        #Add this ip address to all ZK servers
-        iptables_remote(ip_address,ip_address_list,keypair,username)
-        iptables_local(ip_address,ip_address_list)
-                  
-    if zk:
-        zoo.close()
+#     #Add this ip address to all ZK servers
+#     iptables_remote(ip_address,ip_address_list,keypair,username)
+#     iptables_local(ip_address,ip_address_list)
+#     #Get lists of zk ip address
+#     if zk.exists(path):
+#         addresses = zk.children(path)
+#         ip_address_list = list(set(addresses))
+#         
+#         #Add this ip address to all ZK servers
+#         iptables_remote(ip_address,ip_address_list,keypair,username)
+#         iptables_local(ip_address,ip_address_list)
+#                   
+#     if zk:
+#         zoo.close()
 
 
 
