@@ -104,28 +104,35 @@ if len(zookeeper_ip_address_list)>0:
       try:
         ssh.connect(ip_address, 22, username=username, pkey=key) 
         
-        cmd = "iptables -C INPUT -s #{node[:ipaddress]} -j ACCEPT"
-        output_list, error_list = ssh.ssh_execute_command(cmd)
-        output = ' '.join(output_list) + ' '.join(error_list)
-        print 'output:',output
-        if output.find('iptables: Bad rule (does a matching rule exist in that chain?).')>=0:
-            cmd = "/sbin/iptables -A INPUT -s #{node[:ipaddress]} -j ACCEPT" 
-            output_list, error_list = ssh.ssh_execute_command(cmd)
-        
-        cmd = "iptables -C OUTPUT -d #{node[:ipaddress]} -j ACCEPT" 
-        output_list, error_list = ssh.ssh_execute_command(cmd)
-        output = ' '.join(output_list) + ' '.join(error_list)
-        print 'output:',output
-        if output.find('iptables: Bad rule (does a matching rule exist in that chain?).')>=0:
-            print 'OUTPUT',server_type, ip_address, output
-            cmd = "/sbin/iptables -A OUTPUT -d #{node[:ipaddress]} -j ACCEPT" 
-            output_list, error_list = ssh.ssh_execute_command(cmd)
-        
-        cmd = "/etc/init.d/iptables-persistent save" 
+        cmd = "iptables -C INPUT -s %s -j ACCEPT" % (this_ip_address)
         stdin, stdout, stderr = ssh.exec_command(cmd)
-        out = stdout.read()
-        err = stderr.read()
-        print "out--", out
+        error_list = stderr.readlines()
+        if error_list:
+            output = ' '.join(error_list)
+            if output.find('iptables: Bad rule (does a matching rule exist in that chain?).')>=0: 
+                cmd = "/sbin/iptables -A INPUT -s %s -j ACCEPT" % (this_ip_address)
+                print cmd
+                stdin, stdout, stderr = ssh.exec_command(cmd)
+                cmd = "rm /var/chef/cache/unicast_hosts"
+                stdin, stdout, stderr = ssh.exec_command(cmd)
+        
+        cmd = "iptables -C OUTPUT -d %s -j ACCEPT" % (this_ip_address)
+        stdin, stdout, stderr = ssh.exec_command(cmd)
+        error_list = stderr.readlines()
+        if error_list:
+            output = ' '.join(error_list)
+            if output.find('iptables: Bad rule (does a matching rule exist in that chain?).')>=0:
+                cmd = "/sbin/iptables -A OUTPUT -d %s -j ACCEPT" % (this_ip_address)
+                print cmd
+                stdin, stdout, stderr = ssh.exec_command(cmd)
+                cmd = "/etc/init.d/iptables-persistent save" 
+                stdin, stdout, stderr = ssh.exec_command(cmd)
+        
+                cmd = "/etc/init.d/iptables-persistent save" 
+                stdin, stdout, stderr = ssh.exec_command(cmd)
+                out = stdout.read()
+                err = stderr.read()
+                print "out--", out
       except:
         pass
       ssh.close()
