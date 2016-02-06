@@ -66,96 +66,34 @@ easy_install_package "dnspython" do
 end
 
 
+cookbook_file "/var/zookeeper_cluster.py" do
+  source "zookeeper_cluster.py"
+  mode 00744
+end
 
-if datacenter!='local' and datacenter!='aws'
-  script "zookeeper_add" do
-    interpreter "python"
+
+bash "zookeeper_cluster" do
     user "root"
-  code <<-PYCODE
-import paramiko
-import subprocess
-import os
-import dns.resolver
-import zc.zk
-username='#{username}' 
-zookeeper_hosts = []
-zookeeper_ip_address_list = []
-for i in xrange(int(#{required_count})):
-    zookeeper_hosts.append("%s-#{full_domain}" % (i+1))
-zk_host_list = []
+    code <<-EOH
+      /usr/bin/python /var/zookeeper_cluster.py --server_type #{server_type} \
+                        --username #{username} \
+                        --ip_address #{node[:ipaddress]} \
+                        --zk_count #{required_count} \
+                        --zk_hostname #{full_domain} \
+                        --datacenter #{datacenter} \
+                        --environment #{environment} \
+                        --location #{location} \
+                        --slug #{slug} \
+                        --cluster_slug #{cluster_slug} \
+                        --keypair #{keypair}
+    EOH
+    action :run
+end
 
-for aname in zookeeper_hosts:
-  try:
-      data =  dns.resolver.query(aname, 'A')
-      zk_host_list.append(data[0].to_text()+':2181')
-      zookeeper_ip_address_list.append(data[0].to_text())
-  except:
-      print 'ERROR, dns.resolver.NXDOMAIN',aname
-zk_host_str = ','.join(zk_host_list)    
     
 
-if len(zookeeper_ip_address_list)>0:
-  for ip_address in zookeeper_ip_address_list:
-    if ip_address != '#{node[:ipaddress]}':
-      keypair_path = '/root/.ssh/#{keypair}'
-      key = paramiko.RSAKey.from_private_key_file(keypair_path)
-      ssh = paramiko.SSHClient()
-      ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-      try:
-        ssh.connect(ip_address, 22, username=username, pkey=key) 
-        
-        cmd = "iptables -C INPUT -s %s -j ACCEPT" % (this_ip_address)
-        stdin, stdout, stderr = ssh.exec_command(cmd)
-        error_list = stderr.readlines()
-        if error_list:
-            output = ' '.join(error_list)
-            if output.find('iptables: Bad rule (does a matching rule exist in that chain?).')>=0: 
-                cmd = "/sbin/iptables -A INPUT -s %s -j ACCEPT" % (this_ip_address)
-                print cmd
-                stdin, stdout, stderr = ssh.exec_command(cmd)
-                cmd = "rm /var/chef/cache/unicast_hosts"
-                stdin, stdout, stderr = ssh.exec_command(cmd)
-        
-        cmd = "iptables -C OUTPUT -d %s -j ACCEPT" % (this_ip_address)
-        stdin, stdout, stderr = ssh.exec_command(cmd)
-        error_list = stderr.readlines()
-        if error_list:
-            output = ' '.join(error_list)
-            if output.find('iptables: Bad rule (does a matching rule exist in that chain?).')>=0:
-                cmd = "/sbin/iptables -A OUTPUT -d %s -j ACCEPT" % (this_ip_address)
-                print cmd
-                stdin, stdout, stderr = ssh.exec_command(cmd)
-                cmd = "/etc/init.d/iptables-persistent save" 
-                stdin, stdout, stderr = ssh.exec_command(cmd)
-        
-                cmd = "/etc/init.d/iptables-persistent save" 
-                stdin, stdout, stderr = ssh.exec_command(cmd)
-                out = stdout.read()
-                err = stderr.read()
-                print "out--", out
-      except:
-        pass
-      ssh.close()
       
-for ip_address in zookeeper_ip_address_list:     
-  if ip_address != '#{node[:ipaddress]}':
-    cmd = "iptables -C INPUT -s %s -j ACCEPT" % (ip_address)
-    p = subprocess.Popen(cmd, shell=True,stderr=subprocess.STDOUT,stdout=subprocess.PIPE,executable="/bin/bash")
-    out = p.stdout.readline().strip()
-    if out.find('iptables: Bad rule (does a matching rule exist in that chain?).')>=0:
-        cmd = "/sbin/iptables -A INPUT -s %s -j ACCEPT" % (ip_address)
-        os.system(cmd)
-        
-    cmd = "iptables -C OUTPUT -d %s -j ACCEPT" % (ip_address)
-    p = subprocess.Popen(cmd, shell=True,stderr=subprocess.STDOUT,stdout=subprocess.PIPE,executable="/bin/bash")
-    out = p.stdout.readline().strip()
-    if out.find('iptables: Bad rule (does a matching rule exist in that chain?).')>=0:
-        cmd = "/sbin/iptables -A OUTPUT -d  %s -j ACCEPT" % (ip_address)
-        os.system(cmd)
-          
-PYCODE
-  end
-end
+
 
 script "zookeeper_files" do
   interpreter "python"

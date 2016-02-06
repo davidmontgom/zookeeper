@@ -75,6 +75,17 @@ class zookeeper(object):
         self.path = '/%s/' % (node)
         
         return self.path
+    
+    def get_zk_path(self):
+           
+        #if self.cluster_slug=="nocluster" and self.shard==None:
+        node = '%s-%s-%s-%s-%s' % ('zookeeper',self.slug,self.datacenter,self.environment,self.location)
+        #if self.cluster_slug!="nocluster" and self.shard==None:
+        #    node = node = '%s-%s-%s-%s-%s-%s' % ('zookeeper',self.slug,self.datacenter,self.environment,self.location,self.cluster_slug)
+          
+        self.path = '/%s/' % (node)
+        
+        return self.path
         
     def get_address_list(self):
         
