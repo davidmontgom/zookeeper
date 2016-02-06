@@ -68,11 +68,11 @@ class zookeeper(object):
         if self.cluster_slug=="nocluster" and self.shard==None:
             node = '%s-%s-%s-%s-%s' % (self.server_type,self.slug,self.datacenter,self.environment,self.location)
         if self.cluster_slug!="nocluster" and self.shard==None:
-            node = node = '%s-%s-%s-%s-%s-%s' % (self.server_type,self.slug,self.datacenter,self.environment,self.location,self.cluster_slug)
+            node  = '%s-%s-%s-%s-%s-%s' % (self.server_type,self.slug,self.datacenter,self.environment,self.location,self.cluster_slug)
         if self.cluster_slug=="nocluster" and self.shard!=None:
-            node = node = '%s-%s-%s-%s-%s-%s' % (self.server_type,self.slug,self.datacenter,self.environment,self.location,self.shard)
+            node  = '%s-%s-%s-%s-%s-%s' % (self.server_type,self.slug,self.datacenter,self.environment,self.location,self.shard)
         if self.cluster_slug!="nocluster" and self.shard!=None:
-            node = node = '%s-%s-%s-%s-%s-%s-%s' % (self.server_type,self.slug,self.datacenter,self.environment,self.location,self.cluster_slug,self.shard)
+            node  = '%s-%s-%s-%s-%s-%s-%s' % (self.server_type,self.slug,self.datacenter,self.environment,self.location,self.cluster_slug,self.shard)
             
         self.path = '/%s/' % (node)
         
