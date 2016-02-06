@@ -92,21 +92,35 @@ for aname in zookeeper_hosts:
   except:
       print 'ERROR, dns.resolver.NXDOMAIN',aname
 zk_host_str = ','.join(zk_host_list)    
-#zk = zc.zk.ZooKeeper(zk_host_str) 
     
 ip_address_list = zookeeper_hosts
-if len(ip_address_list)>=1:
+if len(ip_address_list)>0:
   for ip_address in ip_address_list:
+    if ip_address != '#{node[:ipaddress]}':
       keypair_path = '/root/.ssh/#{keypair}'
       key = paramiko.RSAKey.from_private_key_file(keypair_path)
       ssh = paramiko.SSHClient()
       ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
       try:
         ssh.connect(ip_address, 22, username=username, pkey=key) 
-        cmd = "/sbin/iptables -A INPUT -s #{node[:ipaddress]} -j ACCEPT"
-        stdin, stdout, stderr = ssh.exec_command(cmd)
-        cmd = "/sbin/iptables -A OUTPUT -d  #{node[:ipaddress]} -j ACCEPT"
-        stdin, stdout, stderr = ssh.exec_command(cmd)
+        
+        cmd = "iptables -C INPUT -s %s -j ACCEPT" % (ip_address)
+        output_list, error_list = ssh.ssh_execute_command(cmd)
+        output = ' '.join(output_list) + ' '.join(error_list)
+        print 'output:',output
+        if output.find('iptables: Bad rule (does a matching rule exist in that chain?).')>=0:
+            cmd = "/sbin/iptables -A INPUT -s %s -j ACCEPT" % (ip_address)
+            output_list, error_list = ssh.ssh_execute_command(cmd)
+        
+        cmd = "iptables -C OUTPUT -d %s -j ACCEPT" % (ip_address)
+        output_list, error_list = ssh.ssh_execute_command(cmd)
+        output = ' '.join(output_list) + ' '.join(error_list)
+        print 'output:',output
+        if output.find('iptables: Bad rule (does a matching rule exist in that chain?).')>=0:
+            print 'OUTPUT',server_type, ip_address, output
+            cmd = "/sbin/iptables -A OUTPUT -d %s -j ACCEPT" % (ip_address)
+            output_list, error_list = ssh.ssh_execute_command(cmd)
+        
         cmd = "/etc/init.d/iptables-persistent save" 
         stdin, stdout, stderr = ssh.exec_command(cmd)
         out = stdout.read()
@@ -116,7 +130,6 @@ if len(ip_address_list)>=1:
         pass
       ssh.close()
       
-  for ip_address in zookeeper_ip_address_list:
       cmd = "iptables -C INPUT -s %s -j ACCEPT" % (ip_address)
       p = subprocess.Popen(cmd, shell=True,stderr=subprocess.STDOUT,stdout=subprocess.PIPE,executable="/bin/bash")
       out = p.stdout.readline().strip()
