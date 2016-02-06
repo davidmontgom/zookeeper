@@ -117,6 +117,9 @@ def iptables_remote(this_ip_address,ip_address_list,keypair,username,cmd_list=[]
         ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
         ssh.connect(ip_address, 22, username=username, pkey=key)
         
+        cmd = "/sbin/iptables -D INPUT -j LOGGING"
+        stdin, stdout, stderr = ssh.exec_command(cmd)
+        
         cmd = "iptables -C INPUT -s %s -j ACCEPT" % (this_ip_address)
         stdin, stdout, stderr = ssh.exec_command(cmd)
         error_list = stderr.readlines()
@@ -141,8 +144,6 @@ def iptables_remote(this_ip_address,ip_address_list,keypair,username,cmd_list=[]
                 cmd = "/etc/init.d/iptables-persistent save" 
                 stdin, stdout, stderr = ssh.exec_command(cmd)
                 
-        cmd = "/sbin/iptables -D INPUT -j LOGGING"
-        stdin, stdout, stderr = ssh.exec_command(cmd)
         cmd = "/sbin/iptables -C INPUT -j LOGGING"
         stdin, stdout, stderr = ssh.exec_command(cmd)
         error_list = stderr.readlines()
@@ -170,6 +171,9 @@ def iptables_local(this_ip_address,ip_address_list):
     
     for ip_address in ip_address_list:     
         
+        cmd = "/sbin/iptables -D INPUT -j LOGGING" 
+        p = subprocess.Popen(cmd, shell=True,stderr=subprocess.STDOUT,stdout=subprocess.PIPE,executable="/bin/bash")
+        
         cmd = "iptables -C INPUT -s %s -j ACCEPT" % (ip_address)
         p = subprocess.Popen(cmd, shell=True,stderr=subprocess.STDOUT,stdout=subprocess.PIPE,executable="/bin/bash")
         out = p.stdout.readline().strip()
@@ -184,8 +188,7 @@ def iptables_local(this_ip_address,ip_address_list):
             cmd = "/sbin/iptables -A OUTPUT -d  %s -j ACCEPT" % (ip_address)
             os.system(cmd)
             
-        cmd = "/sbin/iptables -D INPUT -j LOGGING" 
-        p = subprocess.Popen(cmd, shell=True,stderr=subprocess.STDOUT,stdout=subprocess.PIPE,executable="/bin/bash")
+        
         cmd = "/sbin/iptables -C INPUT -j LOGGING" 
         p = subprocess.Popen(cmd, shell=True,stderr=subprocess.STDOUT,stdout=subprocess.PIPE,executable="/bin/bash")
         out = p.stdout.readline().strip()
