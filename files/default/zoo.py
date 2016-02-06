@@ -42,7 +42,9 @@ class zookeeper(object):
               self.zookeeper_ip_address_list.append(data[0].to_text())
           except:
               print 'ERROR, dns.resolver.NXDOMAIN',aname
-        
+              
+        return self.zookeeper_ip_address_list
+    
     def get_conn(self):
         
         self.get_zk_hostname()

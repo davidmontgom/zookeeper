@@ -11,7 +11,7 @@ from zoo import *
 from pprint import pprint
 
     
-def iptables_remote(this_ip_address,ip_address_list,keypair,username,unicast_hosts):
+def iptables_remote(this_ip_address,ip_address_list,keypair,username):
     
     if this_ip_address in ip_address_list:
         ip_address_list.remove(this_ip_address)
@@ -48,11 +48,6 @@ def iptables_remote(this_ip_address,ip_address_list,keypair,username,unicast_hos
                 cmd = "/etc/init.d/iptables-persistent save" 
                 stdin, stdout, stderr = ssh.exec_command(cmd)
 
-        cmd = """echo '%s' | tee -a '/var/chef/cache/unicast_hosts'""" % unicast_hosts
-        stdin, stdout, stderr = ssh.exec_command(cmd)
-        out = stdout.read()
-        err = stderr.read()
-        print "unicast_hosts--", out
         ssh.close()
        
 
@@ -81,7 +76,7 @@ def zk_cluster(args):
     
     zoo = zookeeper(args)
     zoo.get_zk_hostname()
-    ip_address_list = get_zk_ip_address()
+    ip_address_list = zoo.get_zk_ip_address()
     #zk = zoo.get_conn()
     #path = zoo.get_zk_path()
     
@@ -90,8 +85,8 @@ def zk_cluster(args):
     keypair = args.keypair
     
 #     #Add this ip address to all ZK servers
-#     iptables_remote(ip_address,ip_address_list,keypair,username)
-#     iptables_local(ip_address,ip_address_list)
+    iptables_remote(ip_address,ip_address_list,keypair,username)
+    iptables_local(ip_address,ip_address_list)
 #     #Get lists of zk ip address
 #     if zk.exists(path):
 #         addresses = zk.children(path)
