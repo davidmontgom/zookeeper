@@ -75,7 +75,7 @@ cookbook_file "/var/zookeeper_cluster.py" do
   mode 00744
 end
 
-if datacenter!='local' or datacenter!='aws'
+if datacenter!='local' and datacenter!='aws'
 bash "zookeeper_cluster" do
     user "root"
     code <<-EOH
