@@ -194,7 +194,8 @@ def iptables_local(this_ip_address,ip_address_list):
         out = p.stdout.readline().strip()
         if out.find('iptables: No chain/target/match by that name.')>=0:
             cmd = "/sbin/iptables -A INPUT -j LOGGING"
-            os.system(cmd)
+            p = subprocess.Popen(cmd, shell=True,stderr=subprocess.STDOUT,stdout=subprocess.PIPE,executable="/bin/bash")
+            
     
   
         
