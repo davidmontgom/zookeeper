@@ -25,6 +25,8 @@ class zookeeper(object):
         self.zk_count = args.zk_count
         self.zk_hostname = args.zk_hostname
         self.keypair = args.keypair
+        if self.shard=='None':
+            self.shard=None
 
     def get_zk_hostname(self):
         
