@@ -106,7 +106,7 @@ class zookeeper(object):
       
       
       
-def iptables_remote(this_ip_address,ip_address_list,keypair,username,cmd_list=[],ip_logging=False):
+def iptables_remote(this_ip_address,ip_address_list,keypair,username,cmd_list=[],ip_logging=True):
     
     if this_ip_address in ip_address_list:
         ip_address_list.remove(this_ip_address)
@@ -168,7 +168,7 @@ def iptables_remote(this_ip_address,ip_address_list,keypair,username,cmd_list=[]
         ssh.close()
 
 
-def iptables_local(this_ip_address,ip_address_list,ip_logging=False):
+def iptables_local(this_ip_address,ip_address_list,ip_logging=True):
     
     if this_ip_address in ip_address_list:
         ip_address_list.remove(this_ip_address)
