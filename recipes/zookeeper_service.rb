@@ -34,10 +34,14 @@ required_count = zookeeper_server[datacenter][environment][location][cluster_slu
 full_domain = "#{subdomain}.#{domain}"
 
 
-#This is becuase aws uses SG
 if datacenter!='aws'
   dc_cloud = data_bag_item("meta_data_bag", "#{datacenter}")
   keypair = dc_cloud[node.chef_environment]["keypair"]
+  username = dc_cloud["username"]
+end
+if datacenter=='aws'
+  dc_cloud = data_bag_item("meta_data_bag", "#{datacenter}")
+  keypair = dc_cloud[node.chef_environment][location]["keypair"]
   username = dc_cloud["username"]
 end
 
