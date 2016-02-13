@@ -24,8 +24,9 @@ def zk_cluster(args):
     keypair = args.keypair
     
 #     #Add this ip address to all ZK servers
-    iptables_remote(ip_address,ip_address_list,keypair,username)
-    iptables_local(ip_address,ip_address_list)
+    if args.datacenter!='aws':
+        iptables_remote(ip_address,ip_address_list,keypair,username,datacenter=args.datacenter)
+        iptables_local(ip_address,ip_address_list,datacenter=args.datacenter)
 #     #Get lists of zk ip address
 #     if zk.exists(path):
 #         addresses = zk.children(path)
