@@ -29,6 +29,7 @@ easy_install_package "boto" do
   action :install
 end
 
+#https://github.com/apache/zookeeper/tree/trunk/src/contrib/rest/src
 
 version = '3.4.6'
 bash "install_zookeeper" do

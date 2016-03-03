@@ -108,23 +108,26 @@ script "zookeeper_files" do
   user "root"
 code <<-PYCODE
 import json
+import os
 
 zookeeper_hosts = []
 for i in xrange(int(#{required_count})):
     zookeeper_hosts.append("%s-#{full_domain}" % (i+1))
 zookeeper_hosts = ','.join(zookeeper_hosts)
 
-f = open('/var/zookeeper_hosts.json','w')
-f.write(zookeeper_hosts)
-f.close()
 
-f = open('/var/zookeeper_node_name.json','w')
-f.write('#{node.name} #{node[:ipaddress]}')
-f.close()
-
-f = open('/var/zk_process_monitor_list.json','w')
-f.write('#{zk_process_monitor_list}')
-f.close()
+if not os.path.exists('/var/zookeeper_hosts_overide.json'):
+  f = open('/var/zookeeper_hosts.json','w')
+  f.write(zookeeper_hosts)
+  f.close()
+  
+  f = open('/var/zookeeper_node_name.json','w')
+  f.write('#{node.name} #{node[:ipaddress]}')
+  f.close()
+  
+  f = open('/var/zk_process_monitor_list.json','w')
+  f.write('#{zk_process_monitor_list}')
+  f.close()
 
 
 
