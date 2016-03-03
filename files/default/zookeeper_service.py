@@ -30,11 +30,15 @@ def get_zk_host_list():
     zk_host_list_dns = zk_host_list_dns.split(',')
     zk_host_list = []
     for aname in zk_host_list_dns:
-        try:
-            data =  dns.resolver.query(aname, 'A')
-            zk_host_list.append(data[0].to_text()+':2181')
-        except:
-            print 'ERROR, dns.resolver.NXDOMAIN',aname
+        if aname.count('.')!=3:
+            try:
+                data =  dns.resolver.query(aname, 'A')
+                zk_host_list.append(data[0].to_text()+':2181')
+            except:
+                print 'ERROR, dns.resolver.NXDOMAIN',aname
+        else:
+            zk_host_list.append(aname)
+            
     return zk_host_list
 
 def get_zk_host_str(zk_host_list):

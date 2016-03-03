@@ -7,6 +7,13 @@ logging.basicConfig()
 import paramiko
 import dns.resolver
 import subprocess
+import re
+# RegEx responsible for analyze the IP address "format"
+ip_re = re.compile(r'^d{1,3}.d{1,3}.d{1,3}.d{1,3}$')
+
+
+\
+
 
 
 class zookeeper(object):
@@ -39,11 +46,15 @@ class zookeeper(object):
         
         self.zookeeper_ip_address_list = []
         for aname in self.zookeeper_hosts:
-          try:
-              data =  dns.resolver.query(aname, 'A')
-              self.zookeeper_ip_address_list.append(data[0].to_text())
-          except:
-              print 'ERROR, dns.resolver.NXDOMAIN',aname
+            if aname.count('.')!=3:
+                try:
+                    data =  dns.resolver.query(aname, 'A')
+                    self.zookeeper_ip_address_list.append(data[0].to_text())
+                except:
+                    print 'ERROR, dns.resolver.NXDOMAIN',aname
+            else:
+                self.zookeeper_ip_address_list.append(aname)
+                
               
         return self.zookeeper_ip_address_list
     

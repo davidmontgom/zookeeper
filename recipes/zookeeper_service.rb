@@ -116,7 +116,7 @@ for i in xrange(int(#{required_count})):
 zookeeper_hosts = ','.join(zookeeper_hosts)
 
 
-if not os.path.exists('/var/zookeeper_hosts_overide.json'):
+if not os.path.exists('/var/zookeeper_hosts_overide.lock'):
   f = open('/var/zookeeper_hosts.json','w')
   f.write(zookeeper_hosts)
   f.close()
