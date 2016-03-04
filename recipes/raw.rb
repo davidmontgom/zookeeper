@@ -5,6 +5,8 @@ environment = node.name.split('-')[3]
 location = node.name.split('-')[4]
 cluster_slug = File.read("/var/cluster_slug.txt")
 cluster_slug = cluster_slug.gsub(/\n/, "") 
+cluster_index = File.read("/var/cluster_index.txt")
+cluster_index = cluster_index.gsub(/\n/, "") 
 
 data_bag("meta_data_bag")
 aws = data_bag_item("meta_data_bag", "aws")
@@ -59,35 +61,53 @@ from boto.route53.record import ResourceRecordSets
 from boto.route53.record import Record
 import hashlib
 
-conn = Route53Connection('#{AWS_ACCESS_KEY_ID}', '#{AWS_SECRET_ACCESS_KEY}')
-records = conn.get_all_rrsets('#{zone_id}')
-host_list = {}
-prefix={}
-prefix_ip_hash = {}
-root = None
-for record in records:
-  if record.name.find('#{subdomain}')>=0:
-    if record.resource_records[0]!='#{node[:ipaddress]}':
-      host_list[record.name]=record.resource_records[0]
-      p = record.name.split('-')[0]
-      prefix[p]=1
-      root = record.name[:-1]
-      prefix_ip_hash[p]=record.resource_records[0]
-
-
 this_ip = '#{node[:ipaddress]}'
-base_domain = '#{full_domain}'
-if prefix.has_key('1')==False:
-  this_prefix = '1'
-elif prefix.has_key('2')==False:
-  this_prefix = '2'
-elif prefix.has_key('3')==False:
-  this_prefix = '3'
-elif prefix.has_key('4')==False:
-  this_prefix = '4'
+if not os.path.isfile("/var/zookeeper_hosts_overide.lock"): 
+  conn = Route53Connection('#{AWS_ACCESS_KEY_ID}', '#{AWS_SECRET_ACCESS_KEY}')
+  records = conn.get_all_rrsets('#{zone_id}')
+  host_list = {}
+  prefix={}
+  prefix_ip_hash = {}
+  root = None
+  for record in records:
+    if record.name.find('#{subdomain}')>=0:
+      if record.resource_records[0]!='#{node[:ipaddress]}':
+        host_list[record.name]=record.resource_records[0]
+        p = record.name.split('-')[0]
+        prefix[p]=1
+        root = record.name[:-1]
+        prefix_ip_hash[p]=record.resource_records[0]
+  
+  
+  
+  base_domain = '#{full_domain}'
+  if prefix.has_key('1')==False:
+    this_prefix = '1'
+  elif prefix.has_key('2')==False:
+    this_prefix = '2'
+  elif prefix.has_key('3')==False:
+    this_prefix = '3'
+  elif prefix.has_key('4')==False:
+    this_prefix = '4'
+  else:
+    this_prefix = '5' 
+  prefix_ip_hash[this_prefix]='#{node[:ipaddress]}'
+  
+  this_host = this_prefix + '-' + base_domain
+  this_host = 'server.%s' % this_prefix
+  host_list[this_host]=this_prefix + '-' + base_domain
+  
 else:
-  this_prefix = '5' 
-prefix_ip_hash[this_prefix]='#{node[:ipaddress]}'
+  this_prefix = "#{cluster_index}"
+  with open('/var/cluster_index_zookeeper_hosts.json') as data_file:    
+    prefix_ip_hash = json.load(data_file)
+    
+  f = open('/var/zookeeper_hosts','w')
+  for k,v in prefix_ip_hash.iteritems():
+      f.write('server.%s=%s:2888:3888' % (k,v))
+      f.write("""\n""")
+  f.close()
+  
   
 if not os.path.isfile('/var/lib/zookeeper/myid'): 
   os.system("mkdir -p /var/lib/zookeeper/")
@@ -96,48 +116,32 @@ if not os.path.isfile('/var/lib/zookeeper/myid'):
   cmd = """echo '%s' | tee -a /var/lib/zookeeper/myid""" % this_prefix
   os.system(cmd)
   
-this_host = this_prefix + '-' + base_domain
-this_host = 'server.%s' % this_prefix
-host_list[this_host]=this_prefix + '-' + base_domain
 
-with open('/var/zookeeper_hosts.json', 'w') as fp:
-  json.dump(host_list, fp)
-fnl=["/var/zookeeper_hosts.json"]
-fh = [(fname, hashlib.md5(open("/var/zookeeper_hosts.json", 'rb').read()).hexdigest()) for fname in fnl][0][1]
-hash_file = '/var/fh_%s' % fh
-if not os.path.isfile(hash_file):
-  try:
-    os.system('rm /var/fh_*')
-  except:
-    pass
-  os.system('touch %s' % hash_file)
-  f = open('/var/zookeeper_hosts','w')
-  for k,v in prefix_ip_hash.iteritems():
-      f.write('server.%s=%s:2888:3888' % (k,v))
-      f.write("""\n""")
-  f.close()
+if not os.path.isfile("/var/zookeeper_hosts_overide.lock"): 
+  with open('/var/zookeeper_hosts.json', 'w') as fp:
+    json.dump(host_list, fp)
+  fnl=["/var/zookeeper_hosts.json"]
+  fh = [(fname, hashlib.md5(open("/var/zookeeper_hosts.json", 'rb').read()).hexdigest()) for fname in fnl][0][1]
+  hash_file = '/var/fh_%s' % fh
+  if not os.path.isfile(hash_file):
+    try:
+      os.system('rm /var/fh_*')
+    except:
+      pass
+    os.system('touch %s' % hash_file)
+    f = open('/var/zookeeper_hosts','w')
+    for k,v in prefix_ip_hash.iteritems():
+        f.write('server.%s=%s:2888:3888' % (k,v))
+        f.write("""\n""")
+    f.close()
   
-  f = open('/var/zoo.cfg','w')
-  pre = """
-  tickTime=3000
-  initLimit=10
-  syncLimit=5
-  dataDir=/var/lib/zookeeper
-  clientPort=2181
-  """
-  f.write(pre)
-  for k,v in host_list.iteritems():
-      f.write(k + "=" + v + ":2888:3888")
-      f.write("""\n""")
-  f.close()
-
-
 th = {}
 th[this_host]=this_ip
 with open('/var/this_host.json', 'w') as fp:
   json.dump(th, fp)
 
 PYCODE
+
 end
 
 
