@@ -134,11 +134,6 @@ if not os.path.isfile("/var/zookeeper_hosts_overide.lock"):
         f.write('server.%s=%s:2888:3888' % (k,v))
         f.write("""\n""")
     f.close()
-  
-th = {}
-th[this_host]=this_ip
-with open('/var/this_host.json', 'w') as fp:
-  json.dump(th, fp)
 
 PYCODE
 
