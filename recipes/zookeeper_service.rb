@@ -121,15 +121,15 @@ if not os.path.exists('/var/zookeeper_hosts_overide.lock'):
   f.write(zookeeper_hosts)
   f.close()
   
-  f = open('/var/zookeeper_node_name.json','w')
-  f.write('#{node.name} #{node[:ipaddress]}')
-  f.close()
+  
   
   f = open('/var/zk_process_monitor_list.json','w')
   f.write('#{zk_process_monitor_list}')
   f.close()
 
-
+f = open('/var/zookeeper_node_name.json','w')
+f.write('#{node.name} #{node[:ipaddress]}')
+f.close()
 
 PYCODE
 end
