@@ -69,8 +69,7 @@ class zookeeper(object):
             zk_host_list.append(zk_host+':2181')
 
         zk_host_str = ','.join(zk_host_list)  
-        print zk_host_str
-        exit()
+
         try:  
             zk = zc.zk.ZooKeeper(zk_host_str)
         except:
