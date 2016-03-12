@@ -34,7 +34,7 @@ class zookeeper(object):
     def get_zk_hostname(self):
         
         
-        if os.path.isfile('zookeeper_hosts_overide.lock'):
+        if os.path.isfile('/var/zookeeper_hosts_overide.lock'):
             zk_host_list_dns = open('/var/zookeeper_hosts.json').readlines()[0].strip()
             zk_host_list_dns = zk_host_list_dns.split(',')
             self.zookeeper_hosts = zk_host_list_dns
