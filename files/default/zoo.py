@@ -63,7 +63,7 @@ class zookeeper(object):
     def get_conn(self):
         
         self.get_zk_hostname()
-        self.get_zk_ip_address()
+        self.get_zk_ip_address() 
         zk_host_list = []
         for zk_host in self.zookeeper_ip_address_list:
             zk_host_list.append(zk_host+':2181')
