@@ -33,9 +33,15 @@ class zookeeper(object):
 
     def get_zk_hostname(self):
         
-        self.zookeeper_hosts = []
-        for i in xrange(int(self.zk_count)):
-            self.zookeeper_hosts.append( "%s-%s" % (i+1,self.zk_hostname) )
+        
+        if os.path.isfile('zookeeper_hosts_overide.lock'):
+            zk_host_list_dns = open('/var/zookeeper_hosts.json').readlines()[0].strip()
+            zk_host_list_dns = zk_host_list_dns.split(',')
+            self.zookeeper_hosts = zk_host_list_dns
+        else:
+            self.zookeeper_hosts = []
+            for i in xrange(int(self.zk_count)):
+                self.zookeeper_hosts.append( "%s-%s" % (i+1,self.zk_hostname) )
             
     def get_zk_ip_address(self):
         
@@ -63,7 +69,8 @@ class zookeeper(object):
             zk_host_list.append(zk_host+':2181')
 
         zk_host_str = ','.join(zk_host_list)  
-        
+        print zk_host_str
+        exit()
         try:  
             zk = zc.zk.ZooKeeper(zk_host_str)
         except:

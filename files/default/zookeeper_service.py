@@ -26,7 +26,7 @@ while os.path.exists('/var/chef/cache/zookeeper.ok')==False:
 zk_chksum_init = hashlib.md5(open('/var/zookeeper_hosts.json', 'rb').read()).hexdigest()
 
 def get_zk_host_list():
-    zk_host_list_dns = open('/var/zookeeper_hosts.json').readlines()[0]
+    zk_host_list_dns = open('/var/zookeeper_hosts.json').readlines()[0].strip()
     zk_host_list_dns = zk_host_list_dns.split(',')
     zk_host_list = []
     for aname in zk_host_list_dns:
