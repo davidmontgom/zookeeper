@@ -12,10 +12,6 @@ import re
 ip_re = re.compile(r'^d{1,3}.d{1,3}.d{1,3}.d{1,3}$')
 
 
-\
-
-
-
 class zookeeper(object):
     
     def __init__(self,args):
