@@ -62,6 +62,7 @@ easy_install_package "psutil" do
 end
 
 easy_install_package "paramiko" do
+  options "-U"
   action :install
 end
 
