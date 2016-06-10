@@ -103,6 +103,12 @@ class zookeeper(object):
         self.path = '/%s/' % (node)
         
         return self.path
+    
+    def get_data(self,path,ip_address):
+        
+        data = self.zk.properties('/%s/%s' % (path,ip_address))
+        
+        return data
         
     def get_address_list(self):
         
