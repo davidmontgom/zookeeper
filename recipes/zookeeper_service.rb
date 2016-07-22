@@ -54,9 +54,7 @@ zk_process_monitor_list = node['zk_process_monitor']
 #end
 
 
-python_package 'pip2pi' do
-  version '0.6.8'
-end
+
 
 python_package 'zc.zk'
 python_package 'psutil'
@@ -64,6 +62,10 @@ python_package 'paramiko'
 python_package 'dnspython'
 
 =begin
+python_package 'pip2pi' do
+  version '0.6.8'
+end
+
 easy_install_package "zc.zk" do
   action :install
 end
