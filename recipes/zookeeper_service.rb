@@ -54,7 +54,9 @@ zk_process_monitor_list = node['zk_process_monitor']
 #end
 
 
-
+package "libssl-dev" do
+  action [:install,:upgrade]
+end
 
 python_package 'zc.zk'
 python_package 'psutil'
