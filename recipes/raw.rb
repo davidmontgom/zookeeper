@@ -222,3 +222,5 @@ cron 'noop_status' do
 end
 
 
+#  echo stat | nc 127.0.0.1 2181
+

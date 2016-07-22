@@ -54,22 +54,21 @@ zk_process_monitor_list = node['zk_process_monitor']
 #end
 
 
+python_package 'pip2pi' do
+  version '0.6.8'
+end
 
+python_package 'zc.zk'
+python_package 'psutil'
+python_package 'paramiko'
+python_package 'dnspython'
 
-
+=begin
 easy_install_package "zc.zk" do
   action :install
 end
 
 easy_install_package "psutil" do
-  action :install
-end
-
-package "libffi-dev" do
-  action :install
-end
-
-package "libssl-dev" do
   action :install
 end
 
@@ -81,6 +80,17 @@ end
 easy_install_package "dnspython" do
   action :install
 end
+=end
+
+package "libffi-dev" do
+  action :install
+end
+
+package "libssl-dev" do
+  action :install
+end
+
+
 
 cookbook_file "/var/zoo.py" do
   source "zoo.py"
