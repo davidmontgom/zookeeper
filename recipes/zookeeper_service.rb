@@ -58,6 +58,12 @@ package "libssl-dev" do
   action [:install,:upgrade]
 end
 
+package "libffi-dev" do
+  action [:install,:upgrade]
+end
+
+
+
 python_package 'zc.zk'
 python_package 'psutil'
 python_package 'paramiko'
