@@ -104,12 +104,12 @@ end
 
 cookbook_file "/var/zoo.py" do
   source "zoo.py"
-  mode 00744
+  mode "700"
 end
 
 cookbook_file "/var/zookeeper_cluster.py" do
   source "zookeeper_cluster.py"
-  mode 00744
+  mode "700"
 end
 
 if datacenter!='local' and datacenter!='aws'
@@ -176,7 +176,7 @@ end
  
 cookbook_file "/var/zookeeper_service.py" do
   source "zookeeper_service.py"
-  mode 00744
+  mode "700"
   notifies :run, "execute[restart_zookeeper_health]"
   #notifies :restart, resources(:service => "supervisord")
 end
@@ -186,7 +186,7 @@ template "/etc/supervisor/conf.d/supervisord.zookeeper.health.include.conf" do
   source "supervisord.zookeeper.health.include.conf.erb"
   owner "root"
   group "root"
-  mode "0755"
+  mode "700"
   notifies :restart, resources(:service => "supervisord"), :immediately 
 end
 service "supervisord"
