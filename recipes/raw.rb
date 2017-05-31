@@ -27,9 +27,7 @@ required_count = zookeeper_server[datacenter][environment][location][cluster_slu
 full_domain = "#{subdomain}.#{domain}"
   
   
-easy_install_package "boto" do
-  action :install
-end
+python_package "boto" 
 
 #https://github.com/apache/zookeeper/tree/trunk/src/contrib/rest/src
 
