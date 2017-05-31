@@ -8,13 +8,14 @@ package "maven" do
   action :install
 end
 
+
 bash "install_exhibitor" do
   user "root"
   cwd "/var"
   code <<-EOH
-    git clone https://github.com/Netflix/exhibitor.git
+    git clone https://github.com/soabase/exhibitor.git
     cd exhibitor
-    wget https://raw.github.com/Netflix/exhibitor/master/exhibitor-standalone/src/main/resources/buildscripts/standalone/maven/pom.xml
+    wget https://raw.github.com/soabase/exhibitor/master/exhibitor-standalone/src/main/resources/buildscripts/standalone/maven/pom.xml
     mvn clean package
     cd /var/exhibitor/target
     cp exhibitor-*.jar exhibitor.jar
