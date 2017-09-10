@@ -15,10 +15,11 @@ bash "install_exhibitor" do
   code <<-EOH
     git clone https://github.com/soabase/exhibitor.git
     cd exhibitor
-    wget https://raw.github.com/soabase/exhibitor/master/exhibitor-standalone/src/main/resources/buildscripts/standalone/maven/pom.xml
+    rm pom.xml
+    wget https://raw.githubusercontent.com/Netflix/exhibitor/master/exhibitor-standalone/src/main/resources/buildscripts/standalone/maven/pom.xml
     mvn clean package
     cd /var/exhibitor/target
-    cp exhibitor-*.jar exhibitor.jar
+    cp exhibitor*.jar exhibitor.jar
   EOH
   action :run
   not_if {File.exists?("/var/exhibitor")}
@@ -38,11 +39,6 @@ template "/etc/supervisor/conf.d/exhibitor.conf" do
   #notifies :restart, resources(:service => "supervisord")
   notifies :run, "execute[restart_supervisorctl_exhibitor]"
 end
-
-
-
-
-
 
 
 
