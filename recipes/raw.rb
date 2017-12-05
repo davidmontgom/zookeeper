@@ -31,7 +31,7 @@ python_package "boto"
 
 #https://github.com/apache/zookeeper/tree/trunk/src/contrib/rest/src
 
-version = '3.4.6'
+version = '3.4.11'
 bash "install_zookeeper" do
   user "root"
   cwd "/var"
