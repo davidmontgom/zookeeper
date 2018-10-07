@@ -63,11 +63,17 @@ package "libffi-dev" do
 end
 
 
+bash "install_zookeeper_service_python" do
+  code <<-EOH
+  	pip install zc.zk
+  	pip install psutil
+  	pip install paramiko
+  	pip install dnspython
+  EOH
+end
 
-python_package 'zc.zk'
-python_package 'psutil'
-python_package 'paramiko'
-python_package 'dnspython'
+
+
 
 =begin
 python_package 'pip2pi' do

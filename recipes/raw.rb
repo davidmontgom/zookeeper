@@ -27,11 +27,15 @@ required_count = zookeeper_server[datacenter][environment][location][cluster_slu
 full_domain = "#{subdomain}.#{domain}"
   
   
-python_package "boto" 
+bash "install_zookeeper_boto" do
+  code <<-EOH
+  	pip install boto
+  EOH
+end
 
 #https://github.com/apache/zookeeper/tree/trunk/src/contrib/rest/src
-
-version = '3.4.12'
+#wget http://www.us.apache.org/dist/zookeeper/zookeeper-3.4.12/zookeeper-3.4.12.tar.gz
+version = '3.4.13'
 bash "install_zookeeper" do
   user "root"
   cwd "/var"
