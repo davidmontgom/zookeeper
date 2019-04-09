@@ -40,7 +40,8 @@ bash "install_zookeeper" do
   user "root"
   cwd "/var"
   code <<-EOH
-  wget http://www.us.apache.org/dist/zookeeper/zookeeper-#{version}/zookeeper-#{version}.tar.gz
+  #wget http://www.us.apache.org/dist/zookeeper/zookeeper-#{version}/zookeeper-#{version}.tar.gz
+  wget https://archive.apache.org/dist/zookeeper/zookeeper-#{version}/zookeeper-#{version}.tar.gz
   tar -xvf zookeeper-#{version}.tar.gz
   #mv zookeeper-#{version}.tar.gz zookeeper
   touch /var/chef/cache/zk.lock
