@@ -37,7 +37,7 @@ end
 #wget http://www.us.apache.org/dist/zookeeper/zookeeper-3.4.12/zookeeper-3.4.12.tar.gz
 #wget https://archive.apache.org/dist/zookeeper/zookeeper-3.4.13/zookeeper-3.4.13.tar.gz
 #     https://archive.apache.org/dist/zookeeper/zookeeper-3.4.13/zookeeper-3.4.13.tar.gz
-version = '3.4.13'
+version = '3.6.1'
 bash "install_zookeeper" do
   user "root"
   cwd "/var"
@@ -45,7 +45,7 @@ bash "install_zookeeper" do
   #wget http://www.us.apache.org/dist/zookeeper/zookeeper-#{version}/zookeeper-#{version}.tar.gz
   #wget https://archive.apache.org/dist/zookeeper/zookeeper-#{version}/zookeeper-#{version}.tar.gz
   #wget https://archive.apache.org/dist/zookeeper/zookeeper-#{version}/zookeeper-#{version}.tar.gz
-  wget https://archive.apache.org/dist/zookeeper/zookeeper-3.4.13/zookeeper-3.4.13.tar.gz
+  wget https://archive.apache.org/dist/zookeeper/zookeeper-3.6.1/zookeeper-3.6.1.tar.gz
   tar -xvf zookeeper-#{version}.tar.gz
   #mv zookeeper-#{version}.tar.gz zookeeper
   touch /var/chef/cache/zk.lock
